@@ -6,59 +6,191 @@
     <title>Women Safety Analytics Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #ff4b6e;
+            --secondary-color: #6c5ce7;
+            --danger-color: #ff4757;
+            --warning-color: #ffa502;
+            --success-color: #2ecc71;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 2px solid #f0f0f0;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.5rem;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+        }
+
         .alert-card {
             border-left: 4px solid;
             margin-bottom: 1rem;
             padding: 1rem;
-            border-radius: 4px;
-            background-color: #f8f9fa;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+
         .alert-high {
-            border-left-color: #dc3545;
+            border-left-color: var(--danger-color);
         }
+
         .alert-medium {
-            border-left-color: #ffc107;
+            border-left-color: var(--warning-color);
         }
+
         .alert-low {
-            border-left-color: #28a745;
+            border-left-color: var(--success-color);
         }
+
         #videoFeed {
             width: 100%;
             max-height: 500px;
             object-fit: cover;
+            border-radius: 15px;
         }
-        .stats-card {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 1rem;
+
+        .hotspot-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
             margin-bottom: 1rem;
         }
-        .error-message {
-            color: #dc3545;
-            padding: 1rem;
+
+        .hotspot-location {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .hotspot-score {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .gesture-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--danger-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .gender-distribution {
+            height: 300px;
             margin: 1rem 0;
-            border: 1px solid #dc3545;
-            border-radius: 4px;
-            background-color: #f8d7da;
+        }
+
+        .time-indicator {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 15px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">Women Safety Analytics</a>
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-shield-alt me-2"></i>
+                Women Safety Analytics
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                        <a class="nav-link" href="{{ url_for('home') }}">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('analytics_dashboard') }}">Analytics</a>
+                        <a class="nav-link active" href="{{ url_for('analytics_dashboard') }}">
+                            <i class="fas fa-chart-line me-1"></i> Analytics
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -71,13 +203,27 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Live Feed</h5>
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-video me-2"></i>Live Feed
+                        </h5>
                     </div>
-                    <div class="card-body">
-                        <div id="cameraError" class="error-message" style="display: none;">
-                            Unable to access camera. Please check your camera permissions and try again.
+                    <div class="card-body p-0">
+                        <div class="position-relative">
+                            <div id="cameraError" class="alert alert-danger m-3" style="display: none;">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                Unable to access camera. Please check your camera permissions and try again.
+                            </div>
+                            <video id="videoFeed" autoplay playsinline></video>
+                            <div id="gestureIndicator" class="gesture-indicator" style="display: none;">
+                                <i class="fas fa-exclamation-triangle me-2"></i>SOS Gesture Detected!
+                            </div>
+                            <div id="timeIndicator" class="time-indicator" style="display: none;">
+                                <i class="fas fa-moon me-2"></i>Night Time
+                            </div>
+                            <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+                                <div class="loading-spinner"></div>
+                            </div>
                         </div>
-                        <video id="videoFeed" autoplay playsinline></video>
                     </div>
                 </div>
             </div>
@@ -85,19 +231,35 @@
             <!-- Real-time Statistics -->
             <div class="col-md-4">
                 <div class="stats-card">
-                    <h5>Current Statistics</h5>
-                    <div class="mb-3">
-                        <strong>Men Count:</strong> <span id="menCount">0</span>
+                    <h5><i class="fas fa-users me-2"></i>Current Statistics</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <i class="fas fa-male fa-2x mb-2"></i>
+                                <div class="stats-number" id="menCount">0</div>
+                                <div>Men</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <i class="fas fa-female fa-2x mb-2"></i>
+                                <div class="stats-number" id="womenCount">0</div>
+                                <div>Women</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <strong>Women Count:</strong> <span id="womenCount">0</span>
-                    </div>
-                    <canvas id="genderChart"></canvas>
+                    <canvas id="genderChart" class="gender-distribution"></canvas>
                 </div>
 
-                <div class="stats-card">
-                    <h5>Active Alerts</h5>
-                    <div id="alertsContainer"></div>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Active Alerts
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="alertsContainer"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -107,7 +269,9 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Identified Hotspots</h5>
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-map-marker-alt me-2"></i>Identified Hotspots
+                        </h5>
                     </div>
                     <div class="card-body">
                         <div id="hotspotsContainer"></div>
@@ -123,6 +287,9 @@
         // Initialize video feed
         const video = document.getElementById('videoFeed');
         const cameraError = document.getElementById('cameraError');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const gestureIndicator = document.getElementById('gestureIndicator');
+        const timeIndicator = document.getElementById('timeIndicator');
         let stream = null;
         let processingFrame = false;
 
@@ -151,12 +318,20 @@
                 labels: ['Men', 'Women'],
                 datasets: [{
                     data: [0, 0],
-                    backgroundColor: ['#007bff', '#dc3545']
+                    backgroundColor: ['#6c5ce7', '#ff4b6e']
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: 'white'
+                        }
+                    }
+                }
             }
         });
 
@@ -166,7 +341,11 @@
             container.innerHTML = '';
             
             if (!alerts || alerts.length === 0) {
-                container.innerHTML = '<div class="alert-card alert-low">No active alerts</div>';
+                container.innerHTML = `
+                    <div class="alert-card alert-low">
+                        <i class="fas fa-check-circle me-2"></i>No active alerts
+                    </div>
+                `;
                 return;
             }
             
@@ -174,11 +353,24 @@
                 const alertDiv = document.createElement('div');
                 alertDiv.className = `alert-card alert-${alert.severity}`;
                 alertDiv.innerHTML = `
+                    <i class="fas ${getAlertIcon(alert.severity)} me-2"></i>
                     <strong>${alert.type.replace(/_/g, ' ').toUpperCase()}</strong><br>
                     ${alert.message}
                 `;
                 container.appendChild(alertDiv);
             });
+        }
+
+        // Function to get alert icon
+        function getAlertIcon(severity) {
+            switch(severity) {
+                case 'high':
+                    return 'fa-exclamation-circle';
+                case 'medium':
+                    return 'fa-exclamation-triangle';
+                default:
+                    return 'fa-info-circle';
+            }
         }
 
         // Function to update hotspots
@@ -187,16 +379,26 @@
             container.innerHTML = '';
             
             if (!hotspots || hotspots.length === 0) {
-                container.innerHTML = '<div class="alert-card alert-low">No hotspots identified</div>';
+                container.innerHTML = `
+                    <div class="hotspot-card">
+                        <i class="fas fa-check-circle me-2 text-success"></i>No hotspots identified
+                    </div>
+                `;
                 return;
             }
             
             hotspots.forEach(([location, score]) => {
                 const hotspotDiv = document.createElement('div');
-                hotspotDiv.className = 'alert-card alert-high';
+                hotspotDiv.className = 'hotspot-card';
                 hotspotDiv.innerHTML = `
-                    <strong>Location:</strong> ${location}<br>
-                    <strong>Risk Score:</strong> ${score}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="hotspot-location">
+                            <i class="fas fa-map-marker-alt me-2"></i>${location}
+                        </div>
+                        <div class="hotspot-score">
+                            <i class="fas fa-exclamation-circle me-1"></i>Risk Score: ${score}
+                        </div>
+                    </div>
                 `;
                 container.appendChild(hotspotDiv);
             });
@@ -207,6 +409,7 @@
             if (!stream || processingFrame) return;
             
             processingFrame = true;
+            loadingOverlay.style.display = 'flex';
             
             try {
                 const canvas = document.createElement('canvas');
@@ -241,10 +444,16 @@
                 
                 // Update alerts
                 updateAlerts(data.alerts);
+
+                // Update indicators
+                gestureIndicator.style.display = data.sos_detected ? 'block' : 'none';
+                timeIndicator.style.display = data.is_night_time ? 'block' : 'none';
+                
             } catch (err) {
                 console.error('Error processing frame:', err);
             } finally {
                 processingFrame = false;
+                loadingOverlay.style.display = 'none';
             }
         }
 

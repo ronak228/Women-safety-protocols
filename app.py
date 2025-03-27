@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, send_file
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, send_file, Response
 from database import init_db, get_db, close_db, users, volunteers, emergency_contacts, safety_tips
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -16,10 +16,13 @@ import cv2
 import numpy as np
 from PIL import Image
 import io
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 load_dotenv()
-
-
-# ronak
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -31,6 +34,8 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
 app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('EMAIL_USER')
+app.config['MAIL_MAX_EMAILS'] = None
+app.config['MAIL_ASCII_ATTACHMENTS'] = False
 
 mail = Mail(app)
 
@@ -92,6 +97,7 @@ def send_otp_email(email, otp):
             body=f'Your OTP for verification is: {otp}\nThis OTP will expire in 10 minutes.'
         )
         mail.send(msg)
+        print(f"OTP sent successfully to {email}")
         return True
     except Exception as e:
         print(f"Error sending email: {str(e)}")
@@ -204,51 +210,56 @@ def login():
     if request.method == 'POST':
         try:
             data = request.form
+            email = data.get('email', '').lower().strip()
+            password = data.get('password', '')
             
-            if not validate_email(data['email']):
-                flash('Invalid email address.')
+            if not email or not password:
+                flash('Please enter both email and password.')
                 return redirect(url_for('login'))
             
-            if not data['password']:
-                flash('Password is required.')
+            if not validate_email(email):
+                flash('Please enter a valid email address.')
                 return redirect(url_for('login'))
             
             if users is None:
                 flash('Database connection error. Please try again later.')
                 return redirect(url_for('login'))
             
-            user = users.find_one({'email': data['email'].lower().strip()})
+            user = users.find_one({'email': email})
             if not user:
-                flash('Invalid email or password')
+                flash('No account found with this email address.')
                 return redirect(url_for('login'))
-                
+            
             if not user.get('is_verified', False):
-                session['verification_email'] = user['email']
-                flash('Please verify your email address first.')
-                return redirect(url_for('verify_email'))
-                
-            if check_password_hash(user['password'], data['password']):
+                flash('Please verify your email address before logging in.')
+                return redirect(url_for('login'))
+            
+            if check_password_hash(user['password'], password):
+                # Generate OTP for login verification
                 otp = generate_otp()
-                session['login_otp'] = otp
-                session['login_email'] = user['email']
-                session['login_verified'] = False
-                session['otp_timestamp'] = datetime.utcnow().timestamp()
                 
-                if send_otp_email(user['email'], otp):
-                    flash('Please check your email for OTP verification.')
+                # Store OTP in session
+                session['login_otp'] = otp
+                session['otp_timestamp'] = datetime.utcnow().timestamp()
+                session['login_email'] = email
+                
+                # Send OTP email
+                if send_otp_email(email, otp):
+                    flash('Please check your email for the OTP to complete login.')
                     return redirect(url_for('verify_otp'))
                 else:
                     flash('Failed to send OTP. Please try again.')
                     return redirect(url_for('login'))
             
-            flash('Invalid email or password')
+            flash('Incorrect password. Please try again.')
             return redirect(url_for('login'))
+            
         except Exception as e:
-            flash('An error occurred during login. Please try again.')
             print(f"Login error: {str(e)}")
+            flash('An error occurred during login. Please try again.')
             return redirect(url_for('login'))
     
-    return render_template('login.html', google_auth_url=url_for('google_login'))
+    return render_template('login.html')
 
 @app.route('/verify-email', methods=['GET', 'POST'])
 def verify_email():
@@ -300,23 +311,44 @@ def verify_otp():
         return redirect(url_for('login'))
         
     if request.method == 'POST':
-        entered_otp = request.form.get('otp')
-        stored_otp = session.get('login_otp')
-        otp_timestamp = session.get('otp_timestamp')
-        
-        current_time = datetime.utcnow().timestamp()
-        if current_time - otp_timestamp > 600:
-            flash('OTP has expired. Please login again.')
-            return redirect(url_for('login'))
+        try:
+            entered_otp = request.form.get('otp')
+            stored_otp = session.get('login_otp')
+            otp_timestamp = session.get('otp_timestamp')
+            login_email = session.get('login_email')
             
-        if entered_otp == stored_otp:
-            session['login_verified'] = True
-            session.pop('login_otp', None)
-            session.pop('otp_timestamp', None)
-            flash('Login successful!')
-            return redirect(url_for('home'))
-        else:
-            flash('Invalid OTP. Please try again.')
+            current_time = datetime.utcnow().timestamp()
+            if current_time - otp_timestamp > 600:
+                flash('OTP has expired. Please login again.')
+                return redirect(url_for('login'))
+                
+            if entered_otp == stored_otp:
+                # Get user data
+                user = users.find_one({'email': login_email})
+                if not user:
+                    flash('User not found. Please login again.')
+                    return redirect(url_for('login'))
+                
+                # Set session data
+                session['login_verified'] = True
+                session['user_id'] = str(user['_id'])
+                session['email'] = user['email']
+                session['name'] = f"{user.get('firstName', '')} {user.get('lastName', '')}".strip() or 'User'
+                
+                # Clean up OTP session data
+                session.pop('login_otp', None)
+                session.pop('otp_timestamp', None)
+                session.pop('login_email', None)
+                
+                flash('Login successful!')
+                return redirect(url_for('home'))
+            else:
+                flash('Invalid OTP. Please try again.')
+                
+        except Exception as e:
+            logger.error(f"OTP verification error: {str(e)}")
+            flash('An error occurred during OTP verification. Please try again.')
+            return redirect(url_for('login'))
             
     return render_template('verify_otp.html')
 
@@ -375,7 +407,27 @@ def resend_otp():
 @app.route('/home')
 @login_required
 def home():
-    return render_template('index.html')
+    try:
+        if not session.get('login_verified'):
+            flash('Please login to access this page.')
+            return redirect(url_for('login'))
+            
+        # Get user data
+        user_id = session.get('user_id')
+        if not user_id:
+            flash('Session expired. Please login again.')
+            return redirect(url_for('login'))
+            
+        user = users.find_one({'_id': user_id})
+        if not user:
+            flash('User not found. Please login again.')
+            return redirect(url_for('login'))
+            
+        return render_template('index.html', user=user)
+    except Exception as e:
+        logger.error(f"Home page error: {str(e)}")
+        flash('An error occurred. Please try again.')
+        return redirect(url_for('login'))
 
 @app.route('/emergency')
 @login_required
@@ -664,6 +716,85 @@ def get_statistics():
     except Exception as e:
         print(f"Statistics retrieval error: {str(e)}")
         return jsonify({'error': 'Failed to retrieve statistics'}), 500
+
+def generate_frames():
+    """Generate frames from webcam with analytics overlay"""
+    try:
+        camera = cv2.VideoCapture(0)  # Use default camera
+        
+        while True:
+            success, frame = camera.read()
+            if not success:
+                logger.error("Failed to read frame from camera")
+                break
+                
+            # Process frame with analytics
+            analysis = analytics.process_frame(frame)
+            
+            # Draw bounding boxes and labels
+            detections = analytics.detect_persons(frame)
+            for det in detections:
+                try:
+                    x1, y1, x2, y2, conf, cls = det
+                    person_roi = frame[int(y1):int(y2), int(x1):int(x2)]
+                    gender = analytics.classify_gender(person_roi)
+                    
+                    # Draw bounding box
+                    color = (0, 0, 255) if gender == 'male' else (255, 0, 0)
+                    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
+                    
+                    # Add label
+                    label = f"{gender.upper()} ({conf:.2f})"
+                    cv2.putText(frame, label, (int(x1), int(y1)-10),
+                              cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                except Exception as e:
+                    logger.error(f"Error drawing detection: {str(e)}")
+                    continue
+            
+            # Draw SOS gesture indicator if detected
+            if analysis['sos_detected']:
+                cv2.putText(frame, "SOS DETECTED!", (50, 50),
+                          cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            
+            # Draw night time indicator
+            if analysis['is_night_time']:
+                cv2.putText(frame, "NIGHT TIME", (50, 100),
+                          cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+            
+            # Convert frame to JPEG
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            
+    except Exception as e:
+        logger.error(f"Error in generate_frames: {str(e)}")
+    finally:
+        if 'camera' in locals():
+            camera.release()
+
+@app.route('/video_feed')
+def video_feed():
+    """Stream video feed with analytics overlay"""
+    return Response(generate_frames(),
+                   mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/analytics/stats')
+def get_stats():
+    """Get current statistics"""
+    try:
+        # This would typically come from your analytics system
+        stats = {
+            'total_incidents': 0,
+            'resolved_incidents': 0,
+            'active_alerts': 0,
+            'risk_level': 'low'
+        }
+        return jsonify(stats)
+    except Exception as e:
+        logger.error(f"Error getting stats: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     print("Starting the Women Safety application...")
