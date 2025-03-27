@@ -1,0 +1,158 @@
+/* Custom styles for volunteer page */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Volunteer Opportunity Cards */
+.volunteer-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.volunteer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Icon Styles */
+.volunteer-icon {
+    transition: transform 0.3s ease;
+}
+
+.volunteer-card:hover .volunteer-icon {
+    transform: scale(1.1);
+}
+
+/* Apply Button Styles */
+.apply-btn {
+    transition: all 0.3s ease;
+}
+
+.apply-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Requirements Section */
+.requirements-section {
+    background: linear-gradient(135deg, #E6E6FA 0%, #B0E0E6 100%);
+}
+
+.requirement-item {
+    transition: transform 0.3s ease;
+}
+
+.requirement-item:hover {
+    transform: translateX(5px);
+}
+
+/* Custom Button Styles */
+.btn-primary {
+    background-color: #FFD1DC;
+    color: #4A5568;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #FFB6C1;
+    transform: translateY(-2px);
+}
+
+/* Navigation */
+.nav-link {
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #805AD5;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Footer */
+.footer-link {
+    position: relative;
+}
+
+.footer-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #805AD5;
+    transition: width 0.3s ease;
+}
+
+.footer-link:hover::after {
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .volunteer-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .requirement-item {
+        margin-bottom: 1rem;
+    }
+    
+    .requirements-section {
+        padding: 2rem 1rem;
+    }
+}
+
+/* Animation for Volunteer Cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.volunteer-card {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.volunteer-card:nth-child(1) { animation-delay: 0.1s; }
+.volunteer-card:nth-child(2) { animation-delay: 0.2s; }
+.volunteer-card:nth-child(3) { animation-delay: 0.3s; }
+.volunteer-card:nth-child(4) { animation-delay: 0.4s; }
+.volunteer-card:nth-child(5) { animation-delay: 0.5s; }
+.volunteer-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* Hover Effects for Requirements */
+.requirement-item {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.requirement-item::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #FFD1DC;
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.requirement-item:hover::before {
+    transform: scale(1.5);
+    color: #FFB6C1;
+} 

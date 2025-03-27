@@ -1,0 +1,187 @@
+/* Custom styles for registration page */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Form Container */
+.form-container {
+    background: linear-gradient(135deg, #E6E6FA 0%, #B0E0E6 100%);
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Input Fields */
+.form-input {
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    border-color: #FFD1DC;
+    box-shadow: 0 0 0 3px rgba(255, 209, 220, 0.2);
+}
+
+/* Input Icons */
+.input-icon {
+    color: #A0AEC0;
+    transition: color 0.3s ease;
+}
+
+.form-input:focus + .input-icon {
+    color: #FFD1DC;
+}
+
+/* Submit Button */
+.submit-btn {
+    background-color: #FFD1DC;
+    color: #4A5568;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #FFB6C1;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Checkbox Style */
+.custom-checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 0.25rem;
+    border: 2px solid #CBD5E0;
+    transition: all 0.3s ease;
+}
+
+.custom-checkbox:checked {
+    background-color: #FFD1DC;
+    border-color: #FFD1DC;
+}
+
+/* Navigation */
+.nav-link {
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #805AD5;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Footer */
+.footer-link {
+    position: relative;
+}
+
+.footer-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #805AD5;
+    transition: width 0.3s ease;
+}
+
+.footer-link:hover::after {
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 2rem 1rem;
+    }
+    
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Form Validation Styles */
+.form-input.error {
+    border-color: #FC8181;
+}
+
+.error-message {
+    color: #FC8181;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Success Message */
+.success-message {
+    background-color: #9AE6B4;
+    color: #2F855A;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Loading State */
+.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: -0.75rem 0 0 -0.75rem;
+    border: 3px solid #FFD1DC;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Password Strength Indicator */
+.password-strength {
+    height: 4px;
+    background-color: #E2E8F0;
+    border-radius: 2px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0;
+    transition: all 0.3s ease;
+}
+
+.strength-weak {
+    width: 33.33%;
+    background-color: #FC8181;
+}
+
+.strength-medium {
+    width: 66.66%;
+    background-color: #F6AD55;
+}
+
+.strength-strong {
+    width: 100%;
+    background-color: #68D391;
+} 

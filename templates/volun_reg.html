@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+    <link rel="stylesheet" href="volunteer_regis.css">
+</head>
+<body>
+    <header>
+        <h1>Women Safety Analytics - User Registration</h1>
+    </header>
+    
+    <main>
+        <section class="registration-form">
+            <h2>Register</h2>
+            <form action="/register" method="POST">
+                <label for="name">Full Name:</label>
+                <input type="text" id="name" name="name" required>
+                
+                <label for="email">Email ID:</label>
+                <input type="email" id="email" name="email" required>
+                
+                <label for="aadhaar">Aadhaar Card Number:</label>
+                <input type="text" id="aadhaar" name="aadhaar" required maxlength="12" minlength="12" pattern="\d{12}" title="Please enter a valid 12-digit Aadhaar number">
+                
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location" required>
+                
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                
+                <label for="confirm-password">Confirm Password:</label>
+                <input type="password" id="confirm-password" name="confirm-password" required>
+                
+                <button type="submit">Register</button>
+                <p>Already have an account? <a href="volunteer.html">Login here</a></p>
+            </form>
+        </section>
+    </main>
+    
+    <!-- <footer>
+        <p>&copy; 202 Women Safety Analytics. All rights reserved.</p>
+    </footer> -->
+</body>
+</html>

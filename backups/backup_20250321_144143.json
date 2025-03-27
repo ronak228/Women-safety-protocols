@@ -1,0 +1,56 @@
+{
+  "users": [
+    {
+      "firstName": "LINA",
+      "lastName": "DHOLARIYA  ",
+      "email": "linadholariya4322@gmail.com",
+      "phone": "4155551212",
+      "password": "scrypt:32768:8:1$lLrlQnXuqazdE3Ks$e631b0eb82def0c2b7d20ab3fa312b975e578749907f01f4c7a2171aee601426dde4f4830ea2876f48027d53b0bab3e40edfa2569fb7daaf62058d3782cad31c",
+      "created_at": "2025-03-20 08:00:02.728000"
+    },
+    {
+      "firstName": "Ronak ",
+      "lastName": "Gadhiya",
+      "email": "ronakgadhiya800@gmail.com",
+      "phone": "09054396696",
+      "password": "scrypt:32768:8:1$4Fgbv3O18jR3TLaS$cb1911522cd79f389a7d5a120b41856226d320fd1f6c98bae3ac3deb8801da1289b5fe850b8382e96576cfe843fe4a04f440d5ae706dc4a27cc457b835e5b9cc",
+      "created_at": "2025-03-20 08:13:16.739000"
+    },
+    {
+      "firstName": "Ronak ",
+      "lastName": "Gadhiya",
+      "email": "ronakgadhiya800@g8ail.com",
+      "phone": "09054396696",
+      "password": "scrypt:32768:8:1$mNXF5KhQUmfVTkeR$5346fb59e7680f7ef8842a1b7f91434558725b23864218338a6ae053e6cec54f14a9ee6ffa16021f73fabb33b986b1232be51b82ddc3621cf48b6f2723a42036",
+      "created_at": "2025-03-21 05:10:32.942000"
+    },
+    {
+      "firstName": "harsh",
+      "lastName": "dua",
+      "email": "22it029@charusat.edu.in",
+      "phone": "9328600763",
+      "password": "scrypt:32768:8:1$LGmc6k9oHk9UdPBM$be0b3d7dd6c3abd3568a4404722b6fa3ecd3db0de1f0dc4816147003c8c4b4ed0fa967a8b48f82a6632caf1521d8e9473e4539fb3b2ad95837fa8ed42a5590ab",
+      "created_at": "2025-03-21 08:12:25.663000",
+      "is_verified": true
+    }
+  ],
+  "volunteers": [],
+  "emergency_contacts": [],
+  "safety_tips": [
+    {
+      "title": "Share Location",
+      "description": "Share your location with trusted friends or family when traveling.",
+      "category": "technology"
+    },
+    {
+      "title": "Emergency Contacts",
+      "description": "Keep important emergency numbers saved in your phone.",
+      "category": "preparation"
+    },
+    {
+      "title": "Stay Alert",
+      "description": "Always be aware of your surroundings and trust your instincts.",
+      "category": "general"
+    }
+  ]
+}

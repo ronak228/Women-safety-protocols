@@ -1,0 +1,134 @@
+/* Custom styles for index page */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #B0E0E6 0%, #E6E6FA 100%);
+}
+
+/* Feature Cards */
+.feature-card {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Safety Tips Cards */
+.safety-tip-card {
+    transition: transform 0.3s ease;
+}
+
+.safety-tip-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Custom Button Styles */
+.btn-primary {
+    background-color: #FFD1DC;
+    color: #4A5568;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #FFB6C1;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background-color: white;
+    color: #4A5568;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #F7FAFC;
+    transform: translateY(-2px);
+}
+
+/* Navigation */
+.nav-link {
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #805AD5;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Footer */
+.footer-link {
+    position: relative;
+}
+
+.footer-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #805AD5;
+    transition: width 0.3s ease;
+}
+
+.footer-link:hover::after {
+    width: 100%;
+}
+
+/* Map Container */
+.map-container {
+    margin: 2rem 0;
+    padding: 1rem;
+}
+
+#map {
+    height: 400px;
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Alert Box */
+.alert-box {
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+    background-color: #FEE2E2;
+    color: #991B1B;
+    display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 4rem 1rem;
+    }
+    
+    .feature-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .safety-tip-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    #map {
+        height: 300px;
+    }
+} 

@@ -1,0 +1,127 @@
+/* Custom styles for safety tips page */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Safety Tips Cards */
+.safety-tip-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.safety-tip-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Icon Styles */
+.safety-icon {
+    transition: transform 0.3s ease;
+}
+
+.safety-tip-card:hover .safety-icon {
+    transform: scale(1.1);
+}
+
+/* Emergency Procedures Section */
+.emergency-section {
+    background: linear-gradient(135deg, #FFFACD 0%, #FFD1DC 100%);
+}
+
+.emergency-step {
+    transition: transform 0.3s ease;
+}
+
+.emergency-step:hover {
+    transform: translateX(5px);
+}
+
+/* Custom Button Styles */
+.btn-primary {
+    background-color: #FFD1DC;
+    color: #4A5568;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #FFB6C1;
+    transform: translateY(-2px);
+}
+
+/* Navigation */
+.nav-link {
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #805AD5;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Footer */
+.footer-link {
+    position: relative;
+}
+
+.footer-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #805AD5;
+    transition: width 0.3s ease;
+}
+
+.footer-link:hover::after {
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .safety-tip-card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .emergency-step {
+        margin-bottom: 1rem;
+    }
+    
+    .emergency-section {
+        padding: 2rem 1rem;
+    }
+}
+
+/* Animation for Emergency Steps */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.emergency-step {
+    animation: slideIn 0.5s ease forwards;
+}
+
+.emergency-step:nth-child(1) { animation-delay: 0.1s; }
+.emergency-step:nth-child(2) { animation-delay: 0.2s; }
+.emergency-step:nth-child(3) { animation-delay: 0.3s; }
+.emergency-step:nth-child(4) { animation-delay: 0.4s; }
+.emergency-step:nth-child(5) { animation-delay: 0.5s; } 

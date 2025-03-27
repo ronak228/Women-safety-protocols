@@ -1,0 +1,77 @@
+/* Emergency page specific styles */
+.form-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 2px solid #4A5568;
+    border-radius: 0.25rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.form-checkbox:checked {
+    background-color: #48BB78;
+    border-color: #48BB78;
+}
+
+.form-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Animations */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+#sosButton:active {
+    animation: pulse 0.3s ease-in-out;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    #sosButton,
+    #voiceButton {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+/* Accessibility */
+button:focus {
+    outline: 2px solid #4299E1;
+    outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    #sosButton {
+        background-color: #FF0000;
+    }
+    
+    .form-checkbox:checked {
+        background-color: #000;
+    }
+} 

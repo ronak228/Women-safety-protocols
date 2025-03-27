@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women Safety Analytics</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        .map-container {
+            margin: 2rem 0;
+            text-align: center;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+        .faq, .safety-products {
+            padding: 2rem;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+        .faq-item, .product-item {
+            margin-bottom: 1rem;
+        }
+        .product-item a {
+            text-decoration: none;
+            background-color: #28a745;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .product-item a:hover {
+            background-color: #218838;
+        }
+        .toast {
+            visibility: hidden;
+            max-width: 50%;
+            margin: auto;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 16px;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+        .toast.show {
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Women Safety Analytics</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="volunteer.html">Volunteer Login</a></li>
+                <li><a href="safety-products.html">Safety Products</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="banner">
+            <h2>Protecting Women from Safety Threats</h2>
+            <p>Using advanced analytics and real-time monitoring to create safer environments for women.</p>
+            <a href="login.html" class="btn">Login</a>
+            <a href="volunteer.html" class="btn">Volunteer Login</a>
+        </section>
+        
+        <section class="map-container">
+            <h2>Hotspot Locations</h2>
+            <div id="map"></div>
+        </section>
+        
+        <section class="faq">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-item">
+                <h3>How does the platform work?</h3>
+                <p>The platform uses advanced analytics to monitor and respond to safety threats, providing real-time alerts and support.</p>
+            </div>
+            <div class="faq-item">
+                <h3>How can I become a volunteer?</h3>
+                <p>You can sign up as a volunteer through our Volunteer Login page. We welcome individuals who are passionate about making a difference.</p>
+            </div>
+            <div class="faq-item">
+                <h3>What data is collected?</h3>
+                <p>We collect data related to safety incidents and user interactions to enhance the platform's effectiveness and provide better safety solutions.</p>
+            </div>
+        </section>
+        
+        <section class="safety-products">
+            <h2>Safety Products</h2>
+            <div class="product-item">
+                <h3>Personal Safety Alarm</h3>
+                <p>A compact alarm that can be used to alert others in case of emergency.</p>
+                <a href="https://www.amazon.com/s?k=safety+alarm" target="_blank">View Product</a>
+            </div>
+            <div class="product-item">
+                <h3>Self-Defense Spray</h3>
+                <p>Carry this self-defense spray for added protection against potential threats.</p>
+                <a href="https://www.amazon.com/s?k=self-defense+spray" target="_blank">View Product</a>
+            </div>
+            <div class="product-item">
+                <h3>Personal Safety App</h3>
+                <p>An app that can send alerts and provide safety information at your fingertips.</p>
+                <a href="https://www.amazon.com/s?k=safety+app" target="_blank">View Product</a>
+            </div>
+            <p>For more safety products, visit <a href="https://www.amazon.com/s?k=safety+products" target="_blank">Amazon Safety Products</a>.</p>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2024 Women Safety Analytics. All rights reserved.</p>
+        <p>Contact: info@womensafetyanalytics.com</p>
+    </footer>
+    
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([20.347997, 85.804457], 14);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        var redZones = [
+            { lat: 20.347997, lng: 85.804457, radius: 120 },
+            { lat: 20.3436563, lng: 85.8034403, radius: 120 },
+            { lat: 20.339621, lng: 85.8067146, radius: 120 },
+            { lat: 20.3433443, lng: 85.8082124, radius: 120 },
+            { lat: 20.348478, lng: 85.8054324, radius: 120 }
+        ];
+
+        redZones.forEach(function(zone) {
+            L.circle([zone.lat, zone.lng], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: zone.radius
+            }).addTo(map);
+
+            L.marker([zone.lat, zone.lng]).addTo(map)
+                .bindPopup('Hotspot Location')
+                .openPopup();
+        });
+
+        function showToast(message) {
+            var toast = document.createElement('div');
+            toast.className = 'toast show';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 4000);
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(function(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+
+                L.marker([lat, lng]).addTo(map);
+
+                fetch('http://localhost:3000/update-location', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ lat, lng })
+                })
+                .then(response => response.json())
+                .then(data => showToast(data.message))
+                .catch(error => console.error('Error:', error));
+            });
+        } else {
+            showToast('Geolocation is not supported by this browser.');
+        }
+    </script>
+
+</body>
+</html>
