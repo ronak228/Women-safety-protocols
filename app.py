@@ -11,18 +11,28 @@ import string
 from flask_mail import Mail, Message
 from backup_restore import create_backup, restore_backup, list_backups
 from sso import get_google_auth_url, handle_google_callback
-from analytics import WomenSafetyAnalytics
-import cv2
-import numpy as np
+# from analytics import WomenSafetyAnalytics
+# import cv2
+# import numpy as np
 from PIL import Image
 import io
 import logging
+from geopy.geocoders import Nominatim
+from functools import wraps
+import traceback
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 load_dotenv()
+
+# Validate required environment variables
+required_env_vars = ['EMAIL_USER', 'EMAIL_PASSWORD']
+missing_vars = [var for var in required_env_vars if not os.getenv(var)]
+if missing_vars:
+    print(f"Warning: Missing required environment variables: {', '.join(missing_vars)}")
+    print("Email functionality may not work correctly.")
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -36,8 +46,42 @@ app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('EMAIL_USER')
 app.config['MAIL_MAX_EMAILS'] = None
 app.config['MAIL_ASCII_ATTACHMENTS'] = False
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_DEBUG'] = True
+app.config['MAIL_SUPPRESS_SEND'] = False
+app.config['MAIL_SEND_FAILED_SILENTLY'] = False
 
-mail = Mail(app)
+# Initialize Flask-Mail after all configurations
+mail = Mail()
+mail.init_app(app)
+
+# Test email configuration
+def test_email_config():
+    try:
+        print("\nEmail Configuration:")
+        print(f"Server: {app.config['MAIL_SERVER']}")
+        print(f"Port: {app.config['MAIL_PORT']}")
+        print(f"Username: {app.config['MAIL_USERNAME']}")
+        print(f"TLS: {app.config['MAIL_USE_TLS']}")
+        print(f"SSL: {app.config['MAIL_USE_SSL']}")
+        print(f"Debug: {app.config['MAIL_DEBUG']}")
+        
+        # Test sending an email
+        with app.app_context():
+            msg = Message('Test Email',
+                         recipients=[app.config['MAIL_USERNAME']],
+                         body='This is a test email to verify the email configuration.')
+            mail.send(msg)
+            print("Test email sent successfully!")
+            return True
+    except Exception as e:
+        print(f"Error testing email configuration: {str(e)}")
+        print(f"Error type: {type(e).__name__}")
+        print(f"Full traceback: {traceback.format_exc()}")
+        return False
+
+# Test email configuration on startup
+test_email_config()
 
 # Validation functions
 def validate_email(email):
@@ -77,6 +121,9 @@ twilio_client = None
 if TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN:
     twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
+# Initialize geolocator
+geolocator = Nominatim(user_agent="WomenSafetyApp")
+
 # Initialize database
 try:
     init_db()
@@ -96,11 +143,11 @@ def send_otp_email(email, otp):
             recipients=[email],
             body=f'Your OTP for verification is: {otp}\nThis OTP will expire in 10 minutes.'
         )
+        
         mail.send(msg)
-        print(f"OTP sent successfully to {email}")
         return True
     except Exception as e:
-        print(f"Error sending email: {str(e)}")
+        logger.error(f"Error sending OTP email: {str(e)}")
         return False
 
 # Function to send verification email
@@ -117,24 +164,29 @@ Please enter this code to verify your email address. This code will expire in 10
 
 If you did not register for Women Safety App, please ignore this email.'''
         )
+        
         mail.send(msg)
         return True
     except Exception as e:
-        print(f"Error sending verification email: {str(e)}")
+        logger.error(f"Error sending verification email: {str(e)}")
         return False
 
-# Login required decorator
+# Add this after app initialization
+app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
 def login_required(f):
+    @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('login_verified'):
-            flash('Please login to access this page.')
+            flash('Please log in to access this page.')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
-    decorated_function.__name__ = f.__name__  # Preserve the original function name
     return decorated_function
 
 # Initialize Women Safety Analytics
-analytics = WomenSafetyAnalytics()
+# analytics = WomenSafetyAnalytics()
 
 # Routes
 @app.route('/')
@@ -207,59 +259,48 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'GET':
+        return render_template('login.html', google_auth_url=url_for('google_login'))
+    
     if request.method == 'POST':
         try:
-            data = request.form
-            email = data.get('email', '').lower().strip()
-            password = data.get('password', '')
+            email = request.form.get('email', '').lower().strip()
+            password = request.form.get('password', '')
             
             if not email or not password:
-                flash('Please enter both email and password.')
-                return redirect(url_for('login'))
-            
-            if not validate_email(email):
-                flash('Please enter a valid email address.')
-                return redirect(url_for('login'))
-            
-            if users is None:
-                flash('Database connection error. Please try again later.')
+                flash('Please provide both email and password.')
                 return redirect(url_for('login'))
             
             user = users.find_one({'email': email})
+            
             if not user:
-                flash('No account found with this email address.')
+                flash('Invalid email or password.')
                 return redirect(url_for('login'))
             
             if not user.get('is_verified', False):
-                flash('Please verify your email address before logging in.')
+                flash('Please verify your email before logging in.')
                 return redirect(url_for('login'))
             
             if check_password_hash(user['password'], password):
-                # Generate OTP for login verification
+                # Generate and send OTP
                 otp = generate_otp()
-                
-                # Store OTP in session
-                session['login_otp'] = otp
-                session['otp_timestamp'] = datetime.utcnow().timestamp()
-                session['login_email'] = email
-                
-                # Send OTP email
                 if send_otp_email(email, otp):
-                    flash('Please check your email for the OTP to complete login.')
+                    # Store OTP and email in session
+                    session['login_otp'] = otp
+                    session['otp_timestamp'] = datetime.utcnow().timestamp()
+                    session['login_email'] = email
                     return redirect(url_for('verify_otp'))
                 else:
                     flash('Failed to send OTP. Please try again.')
                     return redirect(url_for('login'))
             
-            flash('Incorrect password. Please try again.')
+            flash('Invalid email or password.')
             return redirect(url_for('login'))
             
         except Exception as e:
-            print(f"Login error: {str(e)}")
+            logger.error(f"Login error: {str(e)}")
             flash('An error occurred during login. Please try again.')
             return redirect(url_for('login'))
-    
-    return render_template('login.html')
 
 @app.route('/verify-email', methods=['GET', 'POST'])
 def verify_email():
@@ -318,7 +359,7 @@ def verify_otp():
             login_email = session.get('login_email')
             
             current_time = datetime.utcnow().timestamp()
-            if current_time - otp_timestamp > 600:
+            if current_time - otp_timestamp > 600:  # 10 minutes expiry
                 flash('OTP has expired. Please login again.')
                 return redirect(url_for('login'))
                 
@@ -332,7 +373,7 @@ def verify_otp():
                 # Set session data
                 session['login_verified'] = True
                 session['user_id'] = str(user['_id'])
-                session['email'] = user['email']
+                session['user_email'] = user['email']
                 session['name'] = f"{user.get('firstName', '')} {user.get('lastName', '')}".strip() or 'User'
                 
                 # Clean up OTP session data
@@ -341,7 +382,7 @@ def verify_otp():
                 session.pop('login_email', None)
                 
                 flash('Login successful!')
-                return redirect(url_for('home'))
+                return redirect(url_for('dashboard'))
             else:
                 flash('Invalid OTP. Please try again.')
                 
@@ -581,7 +622,7 @@ def admin_dashboard():
 
 @app.route('/admin/backup', methods=['POST'])
 @login_required
-def create_backup():
+def admin_create_backup():
     """Create a new backup"""
     try:
         success, result = create_backup()
@@ -591,8 +632,7 @@ def create_backup():
             flash(f'Failed to create backup: {result}')
         return redirect(url_for('admin_dashboard'))
     except Exception as e:
-        print(f"Backup creation error: {str(e)}")
-        flash('Error creating backup')
+        flash(f'Error creating backup: {str(e)}')
         return redirect(url_for('admin_dashboard'))
 
 @app.route('/admin/restore', methods=['POST'])
@@ -618,19 +658,108 @@ def restore_backup():
 
 @app.route('/google/login')
 def google_login():
-    """Initiate Google SSO login"""
-    auth_url = get_google_auth_url()
-    return redirect(auth_url)
+    """Initiate Google login"""
+    try:
+        # Clear any existing OAuth state
+        session.clear()
+        session.modified = True
+        
+        # Get Google auth URL
+        auth_url = get_google_auth_url()
+        if not auth_url:
+            logger.error("Failed to generate Google auth URL")
+            flash("Error initiating Google login. Please try again.", "error")
+            return redirect(url_for('login'))
+            
+        logger.info("Redirecting to Google login page")
+        return redirect(auth_url)
+    except Exception as e:
+        logger.error(f"Error in Google login: {str(e)}")
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        flash("Error initiating Google login. Please try again.", "error")
+        return redirect(url_for('login'))
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    """User dashboard"""
+    try:
+        # Get user's email from session
+        email = session.get('user_email')
+        if not email:
+            flash('Please log in to access the dashboard.')
+            return redirect(url_for('login'))
+        
+        # Get user's location from session
+        location = session.get('user_location', {})
+        
+        # Get user's emergency contacts
+        user = users.find_one({'email': email})
+        if not user:
+            flash('User not found.')
+            return redirect(url_for('login'))
+            
+        emergency_contacts = user.get('emergency_contacts', [])
+        
+        return render_template('user_dashboard.html',
+                             name=session.get('name', 'User'),
+                             location=location,
+                             emergency_contacts=emergency_contacts)
+    except Exception as e:
+        logger.error(f"Error in dashboard: {str(e)}")
+        flash('An error occurred while loading the dashboard.')
+        return redirect(url_for('login'))
 
 @app.route('/google/callback')
 def google_callback():
-    """Handle Google SSO callback"""
-    success, message = handle_google_callback()
-    if success:
-        flash('Login successful!')
-        return redirect(url_for('home'))
-    else:
-        flash(f'Login failed: {message}')
+    """Handle Google OAuth callback"""
+    try:
+        logger.info("Received Google callback")
+        
+        # Handle Google callback
+        user_info = handle_google_callback()
+        if not user_info:
+            logger.error("Failed to handle Google callback")
+            flash("Error during Google login. Please try again.", "error")
+            return redirect(url_for('login'))
+            
+        # Extract user information
+        email = user_info['email']
+        name = user_info['name'].split()
+        first_name = name[0] if name else ''
+        last_name = name[1] if len(name) > 1 else ''
+        
+        # Check if user exists
+        user = users.find_one({'email': email})
+        
+        if not user:
+            # Create new user
+            user = {
+                'firstName': first_name,
+                'lastName': last_name,
+                'email': email,
+                'created_at': datetime.utcnow(),
+                'is_verified': True,  # Google-verified users are pre-verified
+                'google_id': user_info.get('sub', '')
+            }
+            users.insert_one(user)
+            logger.info(f"Created new user: {email}")
+        
+        # Set session variables
+        session['login_verified'] = True
+        session['user_email'] = email
+        session['user_id'] = str(user['_id'])
+        session['name'] = f"{first_name} {last_name}".strip() or 'User'
+        session.modified = True
+        
+        logger.info(f"Successfully logged in user: {email}")
+        flash("Successfully logged in with Google!", "success")
+        return redirect(url_for('dashboard'))
+        
+    except Exception as e:
+        logger.error(f"Error in Google callback: {str(e)}")
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        flash("Error during Google login. Please try again.", "error")
         return redirect(url_for('login'))
 
 @app.route('/logout')
@@ -796,7 +925,56 @@ def get_stats():
         logger.error(f"Error getting stats: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+@app.route('/terms')
+def terms():
+    return render_template('terms.html')
+
+@app.route('/get_location', methods=['POST'])
+def get_location():
+    """Get user's current location"""
+    try:
+        # Get location from request
+        data = request.get_json()
+        if not data or 'latitude' not in data or 'longitude' not in data:
+            return jsonify({
+                'success': False,
+                'message': 'Location data not provided. Please enable location access in your browser settings.'
+            }), 400
+
+        latitude = float(data['latitude'])
+        longitude = float(data['longitude'])
+        
+        # Get address from coordinates
+        try:
+            location = geolocator.reverse(f"{latitude}, {longitude}")
+            address = location.address if location else "Location not found"
+        except Exception as e:
+            logger.error(f"Error getting address: {str(e)}")
+            address = "Address not available"
+        
+        # Store location in session
+        session['user_location'] = {
+            'latitude': latitude,
+            'longitude': longitude,
+            'address': address
+        }
+        
+        return jsonify({
+            'success': True,
+            'message': 'Location updated successfully',
+            'address': address
+        })
+    except Exception as e:
+        logger.error(f"Error in get_location: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'Error processing location data. Please try again.'
+        }), 500
+
 if __name__ == '__main__':
-    print("Starting the Women Safety application...")
-    print("Access the website at: http://localhost:5000")
-    app.run(debug=True) 
+    # Run the app on localhost
+    app.run(host='localhost', port=5000, debug=True) 
