@@ -9,6 +9,10 @@ import logging
 import json
 from functools import wraps
 import traceback
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -18,8 +22,8 @@ logger = logging.getLogger(__name__)
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 # Google OAuth 2.0 configuration
-GOOGLE_CLIENT_ID = "626988614184-f7fie0asejf3nv18gohgnsei7pajv639.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
 GOOGLE_REDIRECT_URI = "http://localhost:5000/google/callback"
 
 # OAuth 2.0 scopes
