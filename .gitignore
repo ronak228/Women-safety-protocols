@@ -1,6 +1,6 @@
 # Environment variables
-.env
 .env.*
+!.env
 
 # Python
 __pycache__/
@@ -35,7 +35,20 @@ ENV/
 *.swp
 *.swo
 
+# Project specific
+data/hotspot_data.json
+*.pth
+*.pt
+*.h5
+*.pkl
+*.model
+*.weights
+*.onnx
+*.tflite
+*.pb
+
 # Logs
+logs/
 *.log
 
 # Database
