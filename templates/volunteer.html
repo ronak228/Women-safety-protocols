@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer - Women Safety</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='volunteer_style.css') }}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pastel-pink': '#FFD1DC',
+                        'pastel-purple': '#E6E6FA',
+                        'pastel-blue': '#B0E0E6',
+                        'pastel-green': '#98FB98',
+                        'pastel-yellow': '#FFFACD',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-pastel-purple">
+    <!-- Navigation -->
+    <nav class="bg-pastel-pink text-gray-800 p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{{ url_for('index') }}" class="text-2xl font-bold hover:text-purple-600 transition duration-300">Women Safety</a>
+            <div class="space-x-4">
+                <a href="{{ url_for('safety_tips') }}" class="hover:text-purple-600">Safety Tips</a>
+                <a href="{{ url_for('volunteer') }}" class="hover:text-purple-600">Volunteer</a>
+                <a href="{{ url_for('login') }}" class="hover:text-purple-600">Login</a>
+                <a href="{{ url_for('register') }}" class="hover:text-purple-600">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Volunteer With Us</h1>
+        
+        <!-- Volunteer Opportunities -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <!-- Opportunity 1 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-pastel-pink text-3xl mb-4">
+                    <i class="fas fa-hand-holding-heart"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Emergency Response</h3>
+                <p class="text-gray-600">Join our emergency response team to provide immediate assistance to women in distress.</p>
+                <button class="mt-4 bg-pastel-pink text-gray-800 px-4 py-2 rounded-lg hover:bg-pink-300 transition duration-300">
+                    Apply Now
+                </button>
+            </div>
+
+            <!-- Opportunity 2 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-pastel-blue text-3xl mb-4">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Safety Training</h3>
+                <p class="text-gray-600">Help conduct self-defense and safety awareness workshops in your community.</p>
+                <button class="mt-4 bg-pastel-blue text-gray-800 px-4 py-2 rounded-lg hover:bg-blue-300 transition duration-300">
+                    Apply Now
+                </button>
+            </div>
+
+            <!-- Opportunity 3 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-pastel-green text-3xl mb-4">
+                    <i class="fas fa-phone-alt"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Helpline Support</h3>
+                <p class="text-gray-600">Provide emotional support and guidance through our 24/7 helpline service.</p>
+                <button class="mt-4 bg-pastel-green text-gray-800 px-4 py-2 rounded-lg hover:bg-green-300 transition duration-300">
+                    Apply Now
+                </button>
+            </div>
+
+            <!-- Opportunity 4 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-pastel-yellow text-3xl mb-4">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Safe Route Mapping</h3>
+                <p class="text-gray-600">Help identify and map safe routes in your neighborhood for women.</p>
+                <button class="mt-4 bg-pastel-yellow text-gray-800 px-4 py-2 rounded-lg hover:bg-yellow-300 transition duration-300">
+                    Apply Now
+                </button>
+            </div>
+
+            <!-- Opportunity 5 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-pastel-purple text-3xl mb-4">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Community Outreach</h3>
+                <p class="text-gray-600">Organize awareness campaigns and community events to promote women's safety.</p>
+                <button class="mt-4 bg-pastel-purple text-gray-800 px-4 py-2 rounded-lg hover:bg-purple-300 transition duration-300">
+                    Apply Now
+                </button>
+            </div>
+
+            <!-- Opportunity 6 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-pastel-pink text-3xl mb-4">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Technical Support</h3>
+                <p class="text-gray-600">Help maintain and improve our safety apps and digital platforms.</p>
+                <button class="mt-4 bg-pastel-pink text-gray-800 px-4 py-2 rounded-lg hover:bg-pink-300 transition duration-300">
+                    Apply Now
+                </button>
+            </div>
+        </div>
+
+        <!-- Volunteer Requirements -->
+        <div class="bg-white p-8 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Volunteer Requirements</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-pastel-pink">General Requirements</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Must be 18 years or older</li>
+                        <li>Commitment to women's safety</li>
+                        <li>Good communication skills</li>
+                        <li>Ability to work in a team</li>
+                        <li>Flexible schedule</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-pastel-blue">Training & Support</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Comprehensive training provided</li>
+                        <li>Regular skill development sessions</li>
+                        <li>Mental health support</li>
+                        <li>Insurance coverage</li>
+                        <li>Recognition and rewards</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <!-- <footer class="bg-pastel-pink text-gray-800 py-8 mt-12">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 Women Safety. All rights reserved.</p>
+            <div class="mt-4 space-x-4">
+                <a href="#" class="hover:text-purple-600">Privacy Policy</a>
+                <a href="#" class="hover:text-purple-600">Terms of Service</a>
+                <a href="#" class="hover:text-purple-600">Contact Us</a>
+            </div>
+        </div>
+    </footer> -->
+</body>
+</html>

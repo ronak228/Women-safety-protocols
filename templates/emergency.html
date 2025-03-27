@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency - Women Safety</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='emergency_style.css') }}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pastel-pink': '#FFD1DC',
+                        'pastel-purple': '#E6E6FA',
+                        'pastel-blue': '#B0E0E6',
+                        'pastel-green': '#98FB98',
+                        'pastel-yellow': '#FFFACD',
+                        'emergency-red': '#FF4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .error-message {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        .input-error {
+            border-color: #dc2626 !important;
+        }
+    </style>
+</head>
+<body class="bg-pastel-purple">
+    <!-- Navigation -->
+    <nav class="bg-pastel-pink text-gray-800 p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="text-2xl font-bold">Women Safety</div>
+            <div class="space-x-4">
+                <a href="{{ url_for('index') }}" class="hover:text-purple-600">Home</a>
+                <a href="{{ url_for('safety_tips') }}" class="hover:text-purple-600">Safety Tips</a>
+                <a href="{{ url_for('volunteer') }}" class="hover:text-purple-600">Volunteer</a>
+                <a href="{{ url_for('login') }}" class="hover:text-purple-600">Login</a>
+                <a href="{{ url_for('register') }}" class="hover:text-purple-600">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Emergency Contact Setup -->
+            <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+                <h2 class="text-2xl font-bold mb-4">Emergency Contacts</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Primary Contact</label>
+                        <input type="tel" id="primaryContact" class="w-full p-2 border rounded" 
+                            placeholder="Enter phone number"
+                            pattern="[0-9]{10}"
+                            title="Please enter a valid 10-digit phone number">
+                        <div class="error-message" id="primaryContactError">Please enter a valid 10-digit phone number</div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Secondary Contact (Optional)</label>
+                        <input type="tel" id="secondaryContact" class="w-full p-2 border rounded" 
+                            placeholder="Enter phone number"
+                            pattern="[0-9]{10}"
+                            title="Please enter a valid 10-digit phone number">
+                        <div class="error-message" id="secondaryContactError">Please enter a valid 10-digit phone number</div>
+                    </div>
+                    <button onclick="saveContacts()" class="bg-pastel-blue hover:bg-blue-400 text-gray-800 font-bold py-2 px-4 rounded">
+                        Save Contacts
+                    </button>
+                </div>
+            </div>
+
+            <!-- Emergency Features -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- SOS Button -->
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <button id="sosButton" onclick="triggerSOS()" class="w-32 h-32 rounded-full bg-emergency-red hover:bg-red-600 text-white font-bold text-xl focus:outline-none transform transition hover:scale-105">
+                        SOS
+                    </button>
+                    <p class="mt-4 text-gray-600">Tap for immediate help</p>
+                </div>
+
+                <!-- Voice Activation -->
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <button id="voiceButton" onclick="toggleVoiceRecognition()" class="w-32 h-32 rounded-full bg-pastel-green hover:bg-green-400 text-gray-800 font-bold focus:outline-none transform transition hover:scale-105">
+                        <i class="fas fa-microphone text-4xl"></i>
+                    </button>
+                    <p class="mt-4 text-gray-600">Say "Help me" to activate</p>
+                </div>
+
+                <!-- Shake Detection -->
+                <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                    <div class="w-32 h-32 mx-auto rounded-full bg-pastel-yellow flex items-center justify-center">
+                        <i class="fas fa-mobile-alt text-4xl"></i>
+                    </div>
+                    <p class="mt-4 text-gray-600">Shake phone to trigger alert</p>
+                    <label class="inline-flex items-center mt-2">
+                        <input type="checkbox" id="shakeToggle" class="form-checkbox" onchange="toggleShakeDetection()">
+                        <span class="ml-2">Enable Shake Detection</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Store for emergency contacts
+        let emergencyContacts = {
+            primary: localStorage.getItem('primaryContact') || '',
+            secondary: localStorage.getItem('secondaryContact') || ''
+        };
+
+        // Function to validate phone number
+        function validatePhone(phone) {
+            if (!phone) return false;
+            const digits = phone.replace(/\D/g, '');
+            return digits.length === 10;
+        }
+
+        // Function to show error message
+        function showError(input, errorElement, message) {
+            input.classList.add('input-error');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        // Function to hide error message
+        function hideError(input, errorElement) {
+            input.classList.remove('input-error');
+            errorElement.style.display = 'none';
+        }
+
+        // Save contacts to localStorage
+        function saveContacts() {
+            const primaryInput = document.getElementById('primaryContact');
+            const secondaryInput = document.getElementById('secondaryContact');
+            const primaryError = document.getElementById('primaryContactError');
+            const secondaryError = document.getElementById('secondaryContactError');
+            
+            const primary = primaryInput.value;
+            const secondary = secondaryInput.value;
+            
+            let isValid = true;
+            
+            // Validate primary contact
+            if (!validatePhone(primary)) {
+                showError(primaryInput, primaryError, 'Please enter a valid 10-digit primary contact number');
+                isValid = false;
+            } else {
+                hideError(primaryInput, primaryError);
+            }
+            
+            // Validate secondary contact if provided
+            if (secondary && !validatePhone(secondary)) {
+                showError(secondaryInput, secondaryError, 'Please enter a valid 10-digit secondary contact number');
+                isValid = false;
+            } else {
+                hideError(secondaryInput, secondaryError);
+            }
+            
+            if (isValid) {
+                if (primary) {
+                    localStorage.setItem('primaryContact', primary);
+                    emergencyContacts.primary = primary;
+                }
+                if (secondary) {
+                    localStorage.setItem('secondaryContact', secondary);
+                    emergencyContacts.secondary = secondary;
+                }
+                alert('Emergency contacts saved successfully!');
+            }
+        }
+
+        // Add input validation listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const primaryInput = document.getElementById('primaryContact');
+            const secondaryInput = document.getElementById('secondaryContact');
+            const primaryError = document.getElementById('primaryContactError');
+            const secondaryError = document.getElementById('secondaryContactError');
+            
+            primaryInput.addEventListener('input', function() {
+                if (validatePhone(this.value)) {
+                    hideError(this, primaryError);
+                } else {
+                    showError(this, primaryError, 'Please enter a valid 10-digit phone number');
+                }
+            });
+            
+            secondaryInput.addEventListener('input', function() {
+                if (!this.value || validatePhone(this.value)) {
+                    hideError(this, secondaryError);
+                } else {
+                    showError(this, secondaryError, 'Please enter a valid 10-digit phone number');
+                }
+            });
+        });
+
+        // SOS Function
+        async function triggerSOS() {
+            if (!emergencyContacts.primary && !emergencyContacts.secondary) {
+                alert('Please set up emergency contacts first!');
+                return;
+            }
+
+            try {
+                const response = await fetch('/trigger_sos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(emergencyContacts)
+                });
+                
+                if (response.ok) {
+                    alert('Emergency contacts have been notified!');
+                } else {
+                    throw new Error('Failed to send SOS');
+                }
+            } catch (error) {
+                alert('Failed to send SOS. Please try again.');
+                console.error('SOS Error:', error);
+            }
+        }
+
+        // Voice Recognition
+        let recognition = null;
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = false;
+
+            recognition.onresult = function(event) {
+                const last = event.results.length - 1;
+                const command = event.results[last][0].transcript.trim().toLowerCase();
+                
+                if (command.includes('help me')) {
+                    triggerSOS();
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+            };
+        }
+
+        function toggleVoiceRecognition() {
+            if (!recognition) {
+                alert('Speech recognition is not supported in your browser.');
+                return;
+            }
+
+            const voiceButton = document.getElementById('voiceButton');
+            
+            if (recognition.started) {
+                recognition.stop();
+                voiceButton.style.backgroundColor = '';
+                recognition.started = false;
+            } else {
+                recognition.start();
+                voiceButton.style.backgroundColor = '#FF9999';
+                recognition.started = true;
+            }
+        }
+
+        // Shake Detection
+        let shakeThreshold = 15;
+        let lastX = 0, lastY = 0, lastZ = 0;
+        let shakeDetectionEnabled = false;
+
+        function toggleShakeDetection() {
+            shakeDetectionEnabled = document.getElementById('shakeToggle').checked;
+            
+            if (shakeDetectionEnabled) {
+                if ('DeviceMotionEvent' in window) {
+                    window.addEventListener('devicemotion', handleShake);
+                } else {
+                    alert('Shake detection is not supported on your device.');
+                    document.getElementById('shakeToggle').checked = false;
+                }
+            } else {
+                window.removeEventListener('devicemotion', handleShake);
+            }
+        }
+
+        function handleShake(event) {
+            if (!shakeDetectionEnabled) return;
+
+            const acceleration = event.accelerationIncludingGravity;
+            if (!acceleration) return;
+
+            const curX = acceleration.x;
+            const curY = acceleration.y;
+            const curZ = acceleration.z;
+
+            if (lastX === 0 && lastY === 0 && lastZ === 0) {
+                lastX = curX;
+                lastY = curY;
+                lastZ = curZ;
+                return;
+            }
+
+            const deltaX = Math.abs(lastX - curX);
+            const deltaY = Math.abs(lastY - curY);
+            const deltaZ = Math.abs(lastZ - curZ);
+
+            if ((deltaX > shakeThreshold && deltaY > shakeThreshold) || 
+                (deltaX > shakeThreshold && deltaZ > shakeThreshold) || 
+                (deltaY > shakeThreshold && deltaZ > shakeThreshold)) {
+                triggerSOS();
+                // Disable shake detection after triggering to prevent multiple alerts
+                document.getElementById('shakeToggle').checked = false;
+                shakeDetectionEnabled = false;
+            }
+
+            lastX = curX;
+            lastY = curY;
+            lastZ = curZ;
+        }
+
+        // Load saved contacts on page load
+        window.onload = function() {
+            const primary = localStorage.getItem('primaryContact');
+            const secondary = localStorage.getItem('secondaryContact');
+            
+            if (primary) document.getElementById('primaryContact').value = primary;
+            if (secondary) document.getElementById('secondaryContact').value = secondary;
+        };
+    </script>
+</body>
+</html> 

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women Safety</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index_style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pastel-pink': '#FFD1DC',
+                        'pastel-purple': '#E6E6FA',
+                        'pastel-blue': '#B0E0E6',
+                        'pastel-green': '#98FB98',
+                        'pastel-yellow': '#FFFACD',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .map-container {
+            margin: 2rem 0;
+            text-align: center;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        .faq {
+            padding: 2rem;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+        .faq-item {
+            margin-bottom: 1rem;
+        }
+        .toast {
+            visibility: hidden;
+            max-width: 50%;
+            margin: auto;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 16px;
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+        .toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 3.5s;
+        }
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+        @keyframes fadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+    </style>
+</head>
+<body class="bg-pastel-purple">
+    <!-- Navigation -->
+    <nav class="bg-pastel-pink text-gray-800 p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{{ url_for('index') }}" class="text-2xl font-bold hover:text-purple-600 transition duration-300">Women Safety</a>
+            <div class="space-x-4">
+                <a href="{{ url_for('index') }}" class="hover:text-purple-600">Home</a>
+                <a href="{{ url_for('safety_tips') }}" class="hover:text-purple-600">Safety Tips</a>
+                <a href="{{ url_for('emergency') }}" class="hover:text-purple-600 text-emergency-red font-bold">Emergency</a>
+                <a href="{{ url_for('volunteer') }}" class="hover:text-purple-600">Volunteer</a>
+                <a href="{{ url_for('admin_dashboard') }}" class="hover:text-purple-600">Admin Dashboard</a>
+                <a href="{{ url_for('login') }}" class="hover:text-purple-600">Login</a>
+                <a href="{{ url_for('register') }}" class="hover:text-purple-600">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-pastel-blue py-20">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Empowering Women's Safety</h1>
+            <p class="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">Join our community dedicated to creating a safer world for women through education, support, and action.</p>
+            <div class="space-x-4">
+                <a href="{{ url_for('register') }}" class="bg-pastel-pink text-gray-800 px-8 py-3 rounded-lg hover:bg-pink-300 transition duration-300">Get Started</a>
+                <a href="{{ url_for('safety_tips') }}" class="bg-white text-gray-800 px-8 py-3 rounded-lg hover:bg-gray-100 transition duration-300">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-gray-800 mb-12 text-center">How We Help</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                    <div class="text-pastel-pink text-3xl mb-4">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Safety Resources</h3>
+                    <p class="text-gray-600">Access comprehensive safety tips, emergency procedures, and self-defense guides.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                    <div class="text-pastel-blue text-3xl mb-4">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Community Support</h3>
+                    <p class="text-gray-600">Connect with a supportive community of women and safety advocates.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                    <div class="text-pastel-green text-3xl mb-4">
+                        <i class="fas fa-hand-holding-heart"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Emergency Assistance</h3>
+                    <p class="text-gray-600">Quick access to emergency contacts and immediate support when needed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="map-container">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Safety Hotspot Map</h2>
+                <p class="text-gray-600 mb-4">View and monitor safety hotspots in your area. Red zones indicate areas with reported safety concerns.</p>
+                <div id="map"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Safety Tips Preview -->
+    <section class="bg-pastel-yellow py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-gray-800 mb-12 text-center">Quick Safety Tips</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Tip 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-semibold mb-2">Stay Connected</h3>
+                    <p class="text-gray-600">Always share your location with trusted contacts when traveling alone.</p>
+                </div>
+
+                <!-- Tip 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-semibold mb-2">Trust Your Instincts</h3>
+                    <p class="text-gray-600">If something feels wrong, remove yourself from the situation immediately.</p>
+                </div>
+
+                <!-- Tip 3 -->
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-semibold mb-2">Plan Ahead</h3>
+                    <p class="text-gray-600">Plan your route in advance and stick to well-lit, populated areas.</p>
+                </div>
+            </div>
+            <div class="text-center mt-8">
+                <a href="{{ url_for('safety_tips') }}" class="inline-block bg-white text-gray-800 px-8 py-3 rounded-lg hover:bg-gray-100 transition duration-300">
+                    View All Safety Tips
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <!-- <footer class="bg-pastel-pink text-gray-800 py-8">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 Women Safety. All rights reserved.</p>
+            <div class="mt-4 space-x-4">
+                <a href="#" class="hover:text-purple-600">Privacy Policy</a>
+                <a href="#" class="hover:text-purple-600">Terms of Service</a>
+                <a href="#" class="hover:text-purple-600">Contact Us</a>
+            </div>
+        </div>
+    </footer> -->
+    
+    <main>
+        <!-- <section class="banner">
+            <h2>Protecting Women from Safety Threats</h2>
+            <p>Using advanced analytics and real-time monitoring to create safer environments for women.</p>
+            <a href="login.html" class="btn">Login</a>
+            <a href="volunteer.html" class="btn">Volunteer Login</a>
+        </section> -->
+        
+        <!-- <section class="map-container">
+            <h2>Hotspot Locations</h2>
+            <div id="map"></div>
+            <div id="alert-box" class="alert-box"></div>
+        </section> -->
+        
+        <!-- <section class="faq">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-item">
+                <h3>How does the platform work?</h3>
+                <p>The platform uses advanced analytics to monitor and respond to safety threats, providing real-time alerts and support.</p>
+            </div>
+            <div class="faq-item">
+                <h3>How can I become a volunteer?</h3>
+                <p>You can register as a volunteer through our platform. We'll review your application and provide necessary training.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Is my data secure?</h3>
+                <p>Yes, we use industry-standard encryption and security measures to protect all user data.</p>
+            </div>
+        </section> -->
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="{{ url_for('static', filename='map.js') }}"></script>
+</body>
+</html>
+

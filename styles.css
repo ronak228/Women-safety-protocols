@@ -1,0 +1,255 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: url('https://images.pexels.com/photos/3735432/pexels-photo-3735432.jpeg') no-repeat center center fixed;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+header, footer {
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
+    color: white;
+    padding: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+header h1, footer p {
+    margin: 0;
+}
+
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #333;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 10px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.banner {
+    padding: 2rem;
+    text-align: center;
+    background-color: #007bff;
+    color: white;
+}
+
+.banner h2 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.banner p {
+    margin: 1rem 0;
+    font-size: 1.2rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    margin: 0 0.5rem;
+    border-radius: 5px;
+}
+
+.btn:hover {
+    background-color: #218838;
+}
+
+@media (max-width: 768px) {
+    .map-container, .faq, .safety-products {
+        padding: 1rem;
+    }
+}
+
+.map-container {
+    padding: 2rem;
+    text-align: center;
+    background-color: #fff;
+    border-top: 2px solid #007bff;
+    flex: 1; 
+}
+
+#map {
+    height: 400px;
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    position: relative;
+    z-index: 1;
+}
+/* .safety-products {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.safety-products h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.product-item {
+    width:30%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 15px;
+}
+
+.product-details {
+    flex: 1;
+}
+
+.product-details h3 {
+    margin: 0;
+    color: #007bff;
+}
+
+.product-details p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.view-product-button {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.view-product-button:hover {
+    background-color: #0056b3;
+}
+
+.amazon-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.amazon-link:hover {
+    text-decoration: underline;
+} */
+.safety-products {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.safety-products h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.product-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjust column count and width */
+    gap: 20px; /* Space between grid items */
+}
+
+.product-item {
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+}
+
+.product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 15px;
+}
+
+.product-details {
+    flex: 1;
+}
+
+.product-details h3 {
+    margin: 0;
+    color: #007bff;
+}
+
+.product-details p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.view-product-button {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.view-product-button:hover {
+    background-color: #0056b3;
+}
+
+.amazon-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.amazon-link:hover {
+    text-decoration: underline;
+}

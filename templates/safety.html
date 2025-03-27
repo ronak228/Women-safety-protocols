@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Tips - Women Safety</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='safety_style.css') }}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pastel-pink': '#FFD1DC',
+                        'pastel-purple': '#E6E6FA',
+                        'pastel-blue': '#B0E0E6',
+                        'pastel-green': '#98FB98',
+                        'pastel-yellow': '#FFFACD',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-pastel-purple">
+    <!-- Navigation -->
+    <nav class="bg-pastel-pink text-gray-800 p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{{ url_for('index') }}" class="text-2xl font-bold hover:text-purple-600 transition duration-300">Women Safety</a>
+            <div class="space-x-4">
+                <a href="{{ url_for('safety_tips') }}" class="hover:text-purple-600">Safety Tips</a>
+                <a href="{{ url_for('volunteer') }}" class="hover:text-purple-600">Volunteer</a>
+                <a href="{{ url_for('login') }}" class="hover:text-purple-600">Login</a>
+                <a href="{{ url_for('register') }}" class="hover:text-purple-600">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Safety Tips</h1>
+        
+        <!-- Safety Tips Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <!-- Tip 1 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-pastel-pink text-3xl mb-4">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Share Your Location</h3>
+                <p class="text-gray-600">Always share your location with trusted friends or family when traveling alone or meeting someone new.</p>
+            </div>
+
+            <!-- Tip 2 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-pastel-blue text-3xl mb-4">
+                    <i class="fas fa-phone-alt"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Emergency Contacts</h3>
+                <p class="text-gray-600">Keep emergency contact numbers saved in your phone and set up quick dial shortcuts for easy access.</p>
+            </div>
+
+            <!-- Tip 3 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-pastel-green text-3xl mb-4">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Self-Defense</h3>
+                <p class="text-gray-600">Consider taking self-defense classes and carrying personal safety devices like pepper spray or a whistle.</p>
+            </div>
+
+            <!-- Tip 4 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-pastel-yellow text-3xl mb-4">
+                    <i class="fas fa-route"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Plan Your Route</h3>
+                <p class="text-gray-600">Plan your route in advance and stick to well-lit, populated areas when walking alone.</p>
+            </div>
+
+            <!-- Tip 5 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-pastel-purple text-3xl mb-4">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Trust Your Instincts</h3>
+                <p class="text-gray-600">If something feels wrong, trust your instincts and remove yourself from the situation immediately.</p>
+            </div>
+
+            <!-- Tip 6 -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+                <div class="text-pastel-pink text-3xl mb-4">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Stay Connected</h3>
+                <p class="text-gray-600">Keep your phone charged and have backup power sources available for emergencies.</p>
+            </div>
+        </div>
+
+        <!-- Emergency Procedures -->
+        <div class="bg-white p-8 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Emergency Procedures</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- If Threatened -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-pastel-pink">If Threatened</h3>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-600">
+                        <li>Stay calm and assess the situation</li>
+                        <li>Make noise to attract attention</li>
+                        <li>Use your personal safety device</li>
+                        <li>Run to a safe location</li>
+                        <li>Call emergency services immediately</li>
+                    </ol>
+                </div>
+
+                <!-- After an Incident -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-4 text-pastel-blue">After an Incident</h3>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-600">
+                        <li>Find a safe place</li>
+                        <li>Contact emergency services</li>
+                        <li>Inform trusted contacts</li>
+                        <li>Document the incident</li>
+                        <li>Seek professional support</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <!-- <footer class="bg-pastel-pink text-gray-800 py-8 mt-12">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 Women Safety. All rights reserved.</p>
+            <div class="mt-4 space-x-4">
+                <a href="#" class="hover:text-purple-600">Privacy Policy</a>
+                <a href="#" class="hover:text-purple-600">Terms of Service</a>
+                <a href="#" class="hover:text-purple-600">Contact Us</a>
+            </div>
+        </div>
+    </footer> -->
+</body>
+</html>

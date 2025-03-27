@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Women Safety</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='register_style.css') }}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pastel-pink': '#FFD1DC',
+                        'pastel-purple': '#E6E6FA',
+                        'pastel-blue': '#B0E0E6',
+                        'pastel-green': '#98FB98',
+                        'pastel-yellow': '#FFFACD',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .error-message {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        .input-error {
+            border-color: #dc2626 !important;
+        }
+    </style>
+</head>
+<body class="bg-pastel-purple">
+    <!-- Navigation -->
+    <nav class="bg-pastel-pink text-gray-800 p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="{{ url_for('index') }}" class="text-2xl font-bold hover:text-purple-600 transition duration-300">Women Safety</a>
+            <div class="space-x-4">
+                <a href="{{ url_for('safety_tips') }}" class="hover:text-purple-600">Safety Tips</a>
+                <a href="{{ url_for('volunteer') }}" class="hover:text-purple-600">Volunteer</a>
+                <a href="{{ url_for('login') }}" class="hover:text-purple-600">Login</a>
+                <a href="{{ url_for('register') }}" class="hover:text-purple-600">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Create Account</h2>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <span class="block sm:inline">{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <form method="POST" action="{{ url_for('register') }}" class="space-y-6" id="registerForm" novalidate>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2" for="firstName">First Name</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input type="text" id="firstName" name="firstName" required 
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-pastel-pink" 
+                                placeholder="First name"
+                                pattern="[a-zA-Z\s]{2,50}"
+                                title="First name should only contain letters and spaces (2-50 characters)">
+                        </div>
+                        <div class="error-message" id="firstNameError">Please enter a valid first name (letters and spaces only)</div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 mb-2" for="lastName">Last Name</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input type="text" id="lastName" name="lastName" required 
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-pastel-pink" 
+                                placeholder="Last name"
+                                pattern="[a-zA-Z\s]{2,50}"
+                                title="Last name should only contain letters and spaces (2-50 characters)">
+                        </div>
+                        <div class="error-message" id="lastNameError">Please enter a valid last name (letters and spaces only)</div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-2" for="email">Email Address</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <input type="email" id="email" name="email" required 
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-pastel-pink" 
+                            placeholder="Enter your email">
+                    </div>
+                    <div class="error-message" id="emailError">Please enter a valid email address</div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-2" for="phone">Phone Number</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                            <i class="fas fa-phone"></i>
+                        </span>
+                        <input type="tel" id="phone" name="phone" required 
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-pastel-pink" 
+                            placeholder="Enter your phone number"
+                            pattern="[0-9]{10}"
+                            title="Please enter a valid 10-digit phone number">
+                    </div>
+                    <div class="error-message" id="phoneError">Please enter a valid 10-digit phone number</div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-2" for="password">Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" id="password" name="password" required 
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-pastel-pink" 
+                            placeholder="Create a password"
+                            pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                            title="Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number">
+                    </div>
+                    <div class="error-message" id="passwordError">Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number</div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-2" for="confirmPassword">Confirm Password</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required 
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-pastel-pink" 
+                            placeholder="Confirm your password">
+                    </div>
+                    <div class="error-message" id="confirmPasswordError">Passwords do not match</div>
+                </div>
+
+                <div class="flex items-center">
+                    <input type="checkbox" id="terms" required class="h-4 w-4 text-pastel-pink focus:ring-pastel-pink border-gray-300 rounded">
+                    <label for="terms" class="ml-2 block text-sm text-gray-700">
+                        I agree to the <a href="#" class="text-pastel-pink hover:text-pink-400">Terms of Service</a> and <a href="#" class="text-pastel-pink hover:text-pink-400">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="w-full bg-pastel-pink text-gray-800 py-2 rounded-lg hover:bg-pink-300 transition duration-300">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-gray-600">Already have an account? <a href="{{ url_for('login') }}" class="text-pastel-pink hover:text-pink-400">Login here</a></p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registerForm');
+            const inputs = form.querySelectorAll('input[required]');
+            const errorMessages = document.querySelectorAll('.error-message');
+
+            // Function to validate email
+            function validateEmail(email) {
+                const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                return re.test(email);
+            }
+
+            // Function to validate phone number
+            function validatePhone(phone) {
+                const digits = phone.replace(/\D/g, '');
+                return digits.length === 10;
+            }
+
+            // Function to validate password
+            function validatePassword(password) {
+                return password.length >= 8 && 
+                       /[A-Z]/.test(password) && 
+                       /[a-z]/.test(password) && 
+                       /[0-9]/.test(password);
+            }
+
+            // Function to validate name
+            function validateName(name) {
+                return /^[a-zA-Z\s]{2,50}$/.test(name);
+            }
+
+            // Function to show error message
+            function showError(input, errorElement, message) {
+                input.classList.add('input-error');
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+
+            // Function to hide error message
+            function hideError(input, errorElement) {
+                input.classList.remove('input-error');
+                errorElement.style.display = 'none';
+            }
+
+            // Add input event listeners for real-time validation
+            inputs.forEach(input => {
+                const errorElement = document.getElementById(input.id + 'Error');
+                
+                input.addEventListener('input', function() {
+                    let isValid = true;
+                    let errorMessage = '';
+
+                    switch(input.id) {
+                        case 'firstName':
+                        case 'lastName':
+                            isValid = validateName(input.value);
+                            errorMessage = 'Please enter a valid name (letters and spaces only)';
+                            break;
+                        case 'email':
+                            isValid = validateEmail(input.value);
+                            errorMessage = 'Please enter a valid email address';
+                            break;
+                        case 'phone':
+                            isValid = validatePhone(input.value);
+                            errorMessage = 'Please enter a valid 10-digit phone number';
+                            break;
+                        case 'password':
+                            isValid = validatePassword(input.value);
+                            errorMessage = 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number';
+                            break;
+                        case 'confirmPassword':
+                            isValid = input.value === document.getElementById('password').value;
+                            errorMessage = 'Passwords do not match';
+                            break;
+                    }
+
+                    if (isValid) {
+                        hideError(input, errorElement);
+                    } else {
+                        showError(input, errorElement, errorMessage);
+                    }
+                });
+            });
+
+            // Form submission validation
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                inputs.forEach(input => {
+                    const errorElement = document.getElementById(input.id + 'Error');
+                    
+                    if (!input.value) {
+                        showError(input, errorElement, 'This field is required');
+                        isValid = false;
+                        e.preventDefault();
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
