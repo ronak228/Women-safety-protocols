@@ -16,9 +16,10 @@ import cv2
 import numpy as np
 from PIL import Image
 import io
-
-# Load environment variables
 load_dotenv()
+
+
+# ronak
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
