@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Safety Tips</h2>
+            <p class="lead mb-4">Stay safe with these important safety guidelines and recommendations.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for tip in tips %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-shield-alt text-primary me-2 fa-2x"></i>
+                        <h5 class="card-title mb-0">{{ tip.title }}</h5>
+                    </div>
+                    <p class="card-text">{{ tip.description }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Additional Safety Resources</h4>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-phone-alt text-primary me-2"></i>Emergency Numbers</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">Police: 100</li>
+                                <li class="mb-2">Women Helpline: 1091</li>
+                                <li class="mb-2">Ambulance: 102</li>
+                                <li class="mb-2">National Emergency: 112</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-link text-primary me-2"></i>Useful Links</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="https://www.ncrb.gov.in/" target="_blank" class="text-decoration-none">
+                                        National Crime Records Bureau
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="https://wcd.nic.in/" target="_blank" class="text-decoration-none">
+                                        Ministry of Women and Child Development
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="https://www.ncw.nic.in/" target="_blank" class="text-decoration-none">
+                                        National Commission for Women
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle fa-3x me-3"></i>
+                        <div>
+                            <h4 class="mb-2">Need Immediate Help?</h4>
+                            <p class="mb-0">
+                                If you're in immediate danger, don't hesitate to:
+                                <br>
+                                1. Call emergency services (100 or 112)
+                                <br>
+                                2. Use our emergency alert feature
+                                <br>
+                                3. Contact your trusted emergency contacts
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effect to cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Contact Us</h2>
+            <p class="lead mb-4">Get in touch with us for support, feedback, or inquiries.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Contact Form -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Send us a message</h4>
+                    <form id="contactForm" action="{{ url_for('contact') }}" method="POST">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <select class="form-select" id="subject" name="subject" required>
+                                <option value="">Select a subject</option>
+                                <option value="support">Technical Support</option>
+                                <option value="feedback">Feedback</option>
+                                <option value="volunteer">Volunteer Inquiry</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Contact Information</h4>
+                    <div class="d-flex mb-3">
+                        <i class="fas fa-envelope text-primary me-3 fa-2x"></i>
+                        <div>
+                            <h5>Email</h5>
+                            <p class="mb-0">support@womensafety.com</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <i class="fas fa-phone text-primary me-3 fa-2x"></i>
+                        <div>
+                            <h5>Phone</h5>
+                            <p class="mb-0">+91 1800-XXX-XXXX</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <i class="fas fa-clock text-primary me-3 fa-2x"></i>
+                        <div>
+                            <h5>Support Hours</h5>
+                            <p class="mb-0">24/7 Emergency Support</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Emergency Numbers</h4>
+                    <div class="d-flex mb-3">
+                        <i class="fas fa-ambulance text-danger me-3 fa-2x"></i>
+                        <div>
+                            <h5>Emergency Services</h5>
+                            <p class="mb-0">112</p>
+                        </div>
+                    </div>
+                    <div class="d-flex mb-3">
+                        <i class="fas fa-phone-alt text-danger me-3 fa-2x"></i>
+                        <div>
+                            <h5>Women Helpline</h5>
+                            <p class="mb-0">1091</p>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <i class="fas fa-shield-alt text-danger me-3 fa-2x"></i>
+                        <div>
+                            <h5>Police</h5>
+                            <p class="mb-0">100</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('contactForm');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form data
+        const formData = new FormData(form);
+        
+        // Send form data to server
+        fetch('{{ url_for("contact") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Thank you for your message. We will get back to you soon.');
+                form.reset();
+            } else {
+                alert('Failed to send message. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again later.');
+        });
+    });
+});
+</script>
+{% endblock %} 
