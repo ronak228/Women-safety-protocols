@@ -3,12 +3,14 @@ from pymongo.errors import ConnectionFailure
 from dotenv import load_dotenv
 import os
 import time
+import ssl
 
 # Load environment variables
 load_dotenv()
 
-# MongoDB Atlas connection string
+# MongoDB connection string and database name
 MONGODB_URI = os.getenv('MONGODB_URI')
+DB_NAME = os.getenv('DB_NAME', 'women_safety')
 
 # Create MongoDB client with timeout and retry
 def get_client():
@@ -17,14 +19,16 @@ def get_client():
     
     for attempt in range(max_retries):
         try:
-            client = MongoClient(MONGODB_URI, 
-                               serverSelectionTimeoutMS=10000,  # Increased timeout
-                               connectTimeoutMS=10000,
+            # Create MongoDB client with proper configuration
+            client = MongoClient(MONGODB_URI,
+                               serverSelectionTimeoutMS=30000,
+                               connectTimeoutMS=30000,
                                retryWrites=True,
                                retryReads=True)
+            
             # Test the connection
             client.server_info()
-            print("Successfully connected to MongoDB!")
+            print("Successfully connected to MongoDB Atlas!")
             return client
         except Exception as e:
             print(f"Attempt {attempt + 1}/{max_retries} failed: {str(e)}")
@@ -32,7 +36,7 @@ def get_client():
                 print(f"Retrying in {retry_delay} seconds...")
                 time.sleep(retry_delay)
             else:
-                print("Failed to connect to MongoDB after all attempts.")
+                print("Failed to connect to MongoDB Atlas. Please check your connection string and network.")
                 return None
 
 # Initialize client and database
@@ -50,7 +54,7 @@ def init_db():
     try:
         client = get_client()
         if client is not None:
-            db = client.womensafety
+            db = client[DB_NAME]
             users = db.users
             volunteers = db.volunteers
             emergency_contacts = db.emergency_contacts
