@@ -170,10 +170,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="contactPhone" class="form-label">Phone</label>
-                        <input type="tel" class="form-control" id="contactPhone" required 
-                               pattern="^(?!0)[6-9][0-9]{9}$|^91[6-9][0-9]{9}$"
-                               title="Please enter a valid Indian mobile number (10 digits starting with 6-9, or with 91 prefix)">
-                        <div class="form-text">Enter a valid Indian mobile number (e.g., 9876543210 or 919876543210)</div>
+                        <input type="tel" class="form-control" id="contactPhone" required pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
                     </div>
                     <div class="mb-3">
                         <label for="contactRelationship" class="form-label">Relationship</label>
@@ -400,31 +397,7 @@ function contactEmergencyContacts() {
     });
 }
 
-// Add this function to validate phone number before submitting
-function validatePhoneNumber(phone) {
-    // Remove all non-digit characters
-    phone = phone.replace(/\D/g, '');
-    
-    // Check if starts with 0
-    if (phone.startsWith('0')) {
-        return false;
-    }
-    
-    // Remove country code if present
-    if (phone.startsWith('91')) {
-        phone = phone.substring(2);
-    }
-    
-    // Check length
-    if (phone.length !== 10) {
-        return false;
-    }
-    
-    // Check first digit
-    return ['6', '7', '8', '9'].includes(phone[0]);
-}
-
-// Update the addEmergencyContact function
+// Add emergency contact function
 function addEmergencyContact() {
     // Get form data
     const formData = {
@@ -437,12 +410,6 @@ function addEmergencyContact() {
     // Validate form data
     if (!formData.name || !formData.email || !formData.relationship || !formData.phone) {
         alert('Please fill in all fields');
-        return;
-    }
-
-    // Validate phone number
-    if (!validatePhoneNumber(formData.phone)) {
-        alert('Please enter a valid Indian mobile number (10 digits starting with 6-9, without leading 0)');
         return;
     }
 

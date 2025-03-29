@@ -136,24 +136,19 @@ def validate_email(email):
     return bool(re.match(pattern, email))
 
 def validate_phone(phone):
-    """Validate Indian mobile number format.
-    Rules:
-    1. Must be 10 digits (excluding country code)
-    2. Must start with 6, 7, 8, or 9
-    3. Can optionally include +91 or 91 prefix
-    4. Cannot start with 0
-    """
     # Remove all non-digit characters
     phone = re.sub(r'\D', '', phone)
     
-    # Check if the number starts with 0
+    # Check if the number starts with 0 (invalid for Indian numbers)
     if phone.startswith('0'):
         return False
         
     # Remove country code if present
     if phone.startswith('91'):
         phone = phone[2:]
-    
+    elif phone.startswith('+91'):
+        phone = phone[3:]
+        
     # Check if the number is exactly 10 digits
     if len(phone) != 10:
         return False

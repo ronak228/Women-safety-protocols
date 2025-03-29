@@ -1,0 +1,64 @@
+from google.oauth2 import id_token
+from google_auth_oauthlib.flow import Flow
+from google.auth.transport import requests
+from flask import session, redirect, url_for
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Load credentials from environment variables
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
+GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI')
+
+# OAuth 2.0 configuration
+SCOPES = ['openid', 'email', 'profile']
+
+def get_google_auth_url():
+    flow = Flow.from_client_config(
+        {
+            "web": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "redirect_uris": [GOOGLE_REDIRECT_URI],
+                "scopes": SCOPES
+            }
+        }
+    )
+    auth_url, _ = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true'
+    )
+    return auth_url
+
+def handle_google_callback():
+    flow = Flow.from_client_config(
+        {
+            "web": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "redirect_uris": [GOOGLE_REDIRECT_URI],
+                "scopes": SCOPES
+            }
+        }
+    )
+    flow.fetch_token(authorization_response=request.url)
+    
+    credentials = flow.credentials
+    id_info = id_token.verify_oauth2_token(
+        credentials.id_token, 
+        requests.Request(), 
+        GOOGLE_CLIENT_ID
+    )
+    
+    session['google_id'] = id_info['sub']
+    session['email'] = id_info['email']
+    session['name'] = id_info.get('name', '')
+    session['picture'] = id_info.get('picture', '')
+    
+    return redirect(url_for('dashboard')) 
