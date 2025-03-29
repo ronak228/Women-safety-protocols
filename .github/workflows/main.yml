@@ -1,19 +1,17 @@
-name: Deploy to Vercel
+name: Deploy
 
 on:
   push:
     branches:
-      - main  # Change this to your deployment branch
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel --yes
-
-      - name: Deploy to Vercel
-        run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+    - name: Deploy to Vercel
+      run: vercel --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
