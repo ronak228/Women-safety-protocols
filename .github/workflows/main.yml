@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy to Vercel
 
 on:
   push:
@@ -11,12 +11,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # Updated to latest version
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          node-version: 18  # Use a stable Node.js version
+          python-version: '3.9'  # Adjust based on your project
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       - name: Install Vercel CLI
         run: npm install -g vercel
