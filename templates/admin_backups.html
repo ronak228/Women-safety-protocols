@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Backup Management</h2>
+            
+            <!-- Create Backup Button -->
+            <div class="mb-4">
+                <form action="{{ url_for('create_backup') }}" method="POST">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-download"></i> Create New Backup
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Backup List -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Available Backups</h5>
+                    
+                    {% if backups %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Backup File</th>
+                                    <th>Created At</th>
+                                    <th>Size</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for backup in backups %}
+                                <tr>
+                                    <td>{{ backup.filename }}</td>
+                                    <td>{{ backup.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                    <td>{{ (backup.size / 1024)|round(2) }} KB</td>
+                                    <td>
+                                        <form action="{{ url_for('restore_backup') }}" method="POST" class="d-inline">
+                                            <input type="hidden" name="backup_file" value="{{ backup.filename }}">
+                                            <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Are you sure you want to restore this backup? This will overwrite current data.')">
+                                                <i class="fas fa-undo"></i> Restore
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No backups available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
