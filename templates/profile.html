@@ -198,7 +198,10 @@
                     </div>
                     <div class="mb-3">
                         <label for="contactPhone" class="form-label">Phone</label>
-                        <input type="tel" class="form-control" id="contactPhone" required pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
+                        <input type="tel" class="form-control" id="contactPhone" required 
+                               pattern="[6-9][0-9]{9}" 
+                               title="Please enter a valid 10-digit Indian mobile number starting with 6-9">
+                        <div class="form-text">Enter a valid 10-digit Indian mobile number starting with 6-9</div>
                     </div>
                     <div class="mb-3">
                         <label for="contactRelationship" class="form-label">Relationship</label>
@@ -344,9 +347,27 @@ function addContact() {
         phone: document.getElementById('contactPhone').value.trim()
     };
 
-    // Validate form data
-    if (!formData.name || !formData.email || !formData.relationship || !formData.phone) {
-        alert('Please fill in all fields');
+    // Validate phone number
+    if (!/^[6-9][0-9]{9}$/.test(formData.phone)) {
+        alert('Please enter a valid 10-digit Indian mobile number starting with 6-9');
+        return;
+    }
+
+    // Validate email
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        alert('Please enter a valid email address');
+        return;
+    }
+
+    // Validate name
+    if (!/^[a-zA-Z\s]{2,50}$/.test(formData.name)) {
+        alert('Please enter a valid name (letters and spaces only)');
+        return;
+    }
+
+    // Validate relationship
+    if (!/^[a-zA-Z\s]{2,30}$/.test(formData.relationship)) {
+        alert('Please enter a valid relationship (letters and spaces only)');
         return;
     }
 
@@ -414,8 +435,8 @@ function updateContact() {
     
     // Validate phone number
     const phone = formData.get('phone');
-    if (!/^[0-9]{10}$/.test(phone)) {
-        alert('Please enter a valid 10-digit phone number');
+    if (!/^[6-9][0-9]{9}$/.test(phone)) {
+        alert('Please enter a valid 10-digit Indian mobile number starting with 6-9');
         return;
     }
     
