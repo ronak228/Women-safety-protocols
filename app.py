@@ -307,7 +307,7 @@ def register():
                 return redirect(url_for('register'))
             
             if not validate_phone(data['phone']):
-                flash('Invalid phone number. Please enter a valid 10-digit phone number.')
+                flash('Invalid phone number. Please enter a valid Indian mobile number (10 digits starting with 6-9, without leading 0).')
                 return redirect(url_for('register'))
             
             if not validate_password(data['password']):
@@ -659,7 +659,7 @@ def volunteer():
                 return redirect(url_for('volunteer'))
             
             if not validate_phone(data['phone']):
-                flash('Invalid phone number. Please enter a valid 10-digit phone number.')
+                flash('Invalid phone number. Please enter a valid Indian mobile number (10 digits starting with 6-9, without leading 0).')
                 return redirect(url_for('volunteer'))
             
             if not data['experience'] or len(data['experience'].strip()) < 10:
@@ -1684,7 +1684,7 @@ def update_profile():
         if not validate_phone(phone):
             return jsonify({
                 'success': False,
-                'message': 'Please enter a valid 10-digit phone number'
+                'message': 'Please enter a valid Indian mobile number (10 digits starting with 6-9, without leading 0).'
             })
             
         # Update user profile
