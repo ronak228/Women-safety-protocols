@@ -80,6 +80,7 @@
                             <th>Name</th>
                             <th>Email</th>
                             <th>Phone</th>
+                            <th>WhatsApp</th>
                             <th>Relationship</th>
                             <th>Actions</th>
                         </tr>
@@ -90,6 +91,7 @@
                             <td>{{ contact.name }}</td>
                             <td>{{ contact.email }}</td>
                             <td>{{ contact.phone if contact.phone else 'Not provided' }}</td>
+                            <td>{{ contact.whatsapp if contact.whatsapp else 'Not provided' }}</td>
                             <td>{{ contact.relationship }}</td>
                             <td>
                                 <button class="btn btn-sm btn-danger" onclick="deleteContact('{{ contact._id }}')">
@@ -173,6 +175,10 @@
                         <input type="tel" class="form-control" id="contactPhone" required pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
                     </div>
                     <div class="mb-3">
+                        <label for="contactWhatsApp" class="form-label">WhatsApp Number (Optional)</label>
+                        <input type="tel" class="form-control" id="contactWhatsApp" pattern="[0-9]{10}" title="Please enter a valid 10-digit WhatsApp number">
+                    </div>
+                    <div class="mb-3">
                         <label for="contactRelationship" class="form-label">Relationship</label>
                         <input type="text" class="form-control" id="contactRelationship" required>
                     </div>
@@ -245,13 +251,13 @@
 // Initialize live tracking map
 let liveMap = L.map('live-map').setView([0, 0], 2);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
+    attribution: ' OpenStreetMap contributors'
 }).addTo(liveMap);
 
 // Initialize history map
 let historyMap = L.map('history-map').setView([0, 0], 2);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
+    attribution: ' OpenStreetMap contributors'
 }).addTo(historyMap);
 
 // Get initial location
@@ -399,48 +405,40 @@ function contactEmergencyContacts() {
 
 // Add emergency contact function
 function addEmergencyContact() {
-    // Get form data
-    const formData = {
-        name: document.getElementById('contactName').value.trim(),
-        email: document.getElementById('contactEmail').value.trim(),
-        relationship: document.getElementById('contactRelationship').value.trim(),
-        phone: document.getElementById('contactPhone').value.trim()
+    const contact = {
+        name: document.getElementById('contactName').value,
+        email: document.getElementById('contactEmail').value,
+        phone: document.getElementById('contactPhone').value,
+        whatsapp: document.getElementById('contactWhatsApp').value,
+        relationship: document.getElementById('contactRelationship').value
     };
 
-    // Validate form data
-    if (!formData.name || !formData.email || !formData.relationship || !formData.phone) {
-        alert('Please fill in all fields');
-        return;
-    }
-
-    // Send data to server
     fetch('/api/emergency-contacts', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
         },
-        body: JSON.stringify(formData),
-        credentials: 'include'
+        body: JSON.stringify(contact)
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => Promise.reject(err));
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Contact added successfully');
-            // Reload the page to show the new contact
-            window.location.reload();
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addContactModal'));
+            modal.hide();
+            
+            // Clear form
+            document.getElementById('contactForm').reset();
+            
+            // Update contacts list
+            updateContactsList();
         } else {
-            alert(data.message || 'Failed to add contact');
+            alert(data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert(error.message || 'Failed to add contact. Please try again.');
+        alert('Failed to add contact. Please try again.');
     });
 }
 
