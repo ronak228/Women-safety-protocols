@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 
 # Initialize Flask app
 app = Flask(__name__)
-app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-secret-key')
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-secret-key')  # Make sure to set a secure FLASK_SECRET_KEY in your .env file
 
 # Initialize LoginManager
 login_manager = LoginManager()
@@ -86,6 +86,7 @@ if missing_vars:
 
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+<<<<<<< HEAD
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
 app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASSWORD')
@@ -93,6 +94,17 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('EMAIL_USER')
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_DEBUG'] = True
 app.config['MAIL_SUPPRESS_SEND'] = False
+=======
+app.config['MAIL_USE_TLS'] = True  # Gmail requires TLS
+app.config['MAIL_USE_SSL'] = False  # Don't need SSL when using TLS
+app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
+app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('EMAIL_USER')
+app.config['MAIL_MAX_EMAILS'] = None
+app.config['MAIL_ASCII_ATTACHMENTS'] = False
+app.config['MAIL_DEBUG'] = app.debug  # Only debug in debug mode
+app.config['MAIL_SUPPRESS_SEND'] = app.testing  # Only suppress in testing mode
+>>>>>>> 6da547bf3fa44b0206644709971b9fe48f04c341
 app.config['MAIL_SEND_FAILED_SILENTLY'] = False
 
 # Initialize Flask-Mail after all configurations
@@ -181,6 +193,23 @@ def validate_emergency_contact(contact):
     if not validate_phone(contact.get('phone', '')):
         return False, "Invalid phone number format"
         
+<<<<<<< HEAD
+=======
+    # Validate WhatsApp number
+    whatsapp_number = contact.get('whatsapp')
+    if whatsapp_number:
+        # Remove all non-digit characters
+        whatsapp_number = re.sub(r'\D', '', whatsapp_number)
+        # Check if length is 10
+        if len(whatsapp_number) != 10:
+            return False, "Invalid WhatsApp number format"
+        # Check if first digit is between 6-9 (Indian mobile number format)
+        if not whatsapp_number[0] in ['6', '7', '8', '9']:
+            return False, "Invalid WhatsApp number format"
+        # Format WhatsApp number for messaging
+        whatsapp_number = f"+91{whatsapp_number}"
+        
+>>>>>>> 6da547bf3fa44b0206644709971b9fe48f04c341
     # Validate relationship
     if not validate_name(contact.get('relationship', '')):
         return False, "Invalid relationship format"
@@ -312,7 +341,7 @@ def register():
                 return redirect(url_for('register'))
             
             if not validate_phone(data['phone']):
-                flash('Invalid phone number. Please enter a valid 10-digit phone number.')
+                flash('Invalid phone number. Please enter a valid Indian mobile number (10 digits starting with 6-9, without leading 0).')
                 return redirect(url_for('register'))
             
             if not validate_password(data['password']):
@@ -664,7 +693,7 @@ def volunteer():
                 return redirect(url_for('volunteer'))
             
             if not validate_phone(data['phone']):
-                flash('Invalid phone number. Please enter a valid 10-digit phone number.')
+                flash('Invalid phone number. Please enter a valid Indian mobile number (10 digits starting with 6-9, without leading 0).')
                 return redirect(url_for('volunteer'))
             
             if not data['experience'] or len(data['experience'].strip()) < 10:
@@ -782,6 +811,7 @@ def emergency_contacts():
                 'email': data['email'].lower().strip(),
                 'relationship': data['relationship'].strip(),
                 'phone': data['phone'].strip(),
+                'whatsapp': data.get('whatsapp', '').strip(),  # Optional WhatsApp number
                 'created_at': datetime.utcnow()
             }
 
@@ -822,7 +852,12 @@ def update_contact_api(contact_id):
             'name': request.form.get('name', '').strip(),
             'email': request.form.get('email', '').lower().strip(),
             'relationship': request.form.get('relationship', '').strip(),
+<<<<<<< HEAD
             'phone': request.form.get('phone', '').strip()
+=======
+            'phone': request.form.get('phone', '').strip(),
+            'whatsapp': request.form.get('whatsapp', '').strip()  # Optional WhatsApp number
+>>>>>>> 6da547bf3fa44b0206644709971b9fe48f04c341
         }
 
         # Validate contact data
@@ -845,6 +880,10 @@ def update_contact_api(contact_id):
                     'email': data['email'],
                     'relationship': data['relationship'],
                     'phone': data['phone'],
+<<<<<<< HEAD
+=======
+                    'whatsapp': data['whatsapp'],  # Update WhatsApp number
+>>>>>>> 6da547bf3fa44b0206644709971b9fe48f04c341
                     'updated_at': datetime.utcnow()
                 }
             }
@@ -1383,10 +1422,12 @@ def trigger_emergency():
         # Get emergency contacts
         emergency_contacts = list(db.emergency_contacts.find({'user_id': user_id}))
         
-        # Send email notifications to emergency contacts
+        # Send notifications to emergency contacts
         success_count = 0
+        success_whatsapp = 0
+        
         for contact in emergency_contacts:
-            # Prepare email message
+            # Prepare messages
             subject = f"EMERGENCY ALERT from {user.get('firstName', '')} {user.get('lastName', '')}"
             message = f"""
             EMERGENCY ALERT!
@@ -1401,24 +1442,46 @@ def trigger_emergency():
             if current_location:
                 google_maps_link = f"https://www.google.com/maps?q={current_location['latitude']},{current_location['longitude']}"
                 message += f"\nLast known location: {google_maps_link}"
-            
+                
             # Send email notification
             if send_alert_email(contact['email'], subject, message):
                 success_count += 1
                 
+            # Send WhatsApp message
+            if twilio_client and contact.get('whatsapp'):
+                try:
+                    whatsapp_message = f"EMERGENCY ALERT! {user.get('firstName', '')} {user.get('lastName', '')} needs help!"
+                    if current_location:
+                        whatsapp_message += f"\nLocation: {google_maps_link}"
+                    
+                    # Format phone number for WhatsApp (Indian numbers: +91)
+                    whatsapp_number = f"whatsapp:+91{contact['whatsapp']}"
+                    
+                    message = twilio_client.messages.create(
+                        to=whatsapp_number,
+                        from_=f"whatsapp:{TWILIO_PHONE_NUMBER}",
+                        body=whatsapp_message
+                    )
+                    logger.info(f"WhatsApp message sent successfully to {whatsapp_number}")
+                    success_whatsapp += 1
+                except Exception as e:
+                    logger.error(f"Failed to send WhatsApp message to {whatsapp_number}: {str(e)}")
+                    continue
+                    
         # Log the alert
         db.alerts.insert_one({
             'user_id': user_id,
             'subject': subject,
             'message': message,
             'sent_to': success_count,
+            'sent_whatsapp': success_whatsapp,
             'total_contacts': len(emergency_contacts),
             'timestamp': datetime.utcnow()
         })
         
         return jsonify({
             'success': True,
-            'message': f'Emergency alert sent to {success_count} out of {len(emergency_contacts)} contacts'
+            'message': f'Emergency alert sent to {success_count} contacts via email and {success_whatsapp} contacts via WhatsApp'
         })
         
     except Exception as e:
@@ -1502,6 +1565,11 @@ def contact_emergency():
 def send_alert_email(email, subject, message):
     """Send alert message via email"""
     try:
+        # Validate email configuration
+        if not app.config.get('MAIL_SERVER') or not app.config.get('MAIL_USERNAME') or not app.config.get('MAIL_PASSWORD'):
+            logger.error("Email configuration is missing. Please check your .env file.")
+            return False
+
         msg = Message(
             subject=subject,
             recipients=[email],
@@ -1509,11 +1577,21 @@ def send_alert_email(email, subject, message):
         )
         
         with app.app_context():
-            mail.send(msg)
-            logger.info(f"Alert email sent successfully to {email}")
-            return True
+            try:
+                mail.send(msg)
+                logger.info(f"Alert email sent successfully to {email}")
+                return True
+            except Exception as e:
+                logger.error(f"Failed to send email to {email}: {str(e)}")
+                if 'connection refused' in str(e).lower():
+                    logger.error("SMTP server connection refused. Please check your mail server settings.")
+                elif 'authentication failed' in str(e).lower():
+                    logger.error("SMTP authentication failed. Please check your email credentials.")
+                elif 'invalid recipient' in str(e).lower():
+                    logger.error(f"Invalid email address: {email}")
+                return False
     except Exception as e:
-        logger.error(f"Error sending alert email: {str(e)}")
+        logger.error(f"Error in email sending process: {str(e)}")
         logger.error(f"Full traceback: {traceback.format_exc()}")
         return False
 
@@ -1689,7 +1767,7 @@ def update_profile():
         if not validate_phone(phone):
             return jsonify({
                 'success': False,
-                'message': 'Please enter a valid 10-digit phone number'
+                'message': 'Please enter a valid Indian mobile number (10 digits starting with 6-9, without leading 0).'
             })
             
         # Update user profile
@@ -1852,6 +1930,7 @@ def add_emergency_contact():
         relationship = request.form.get('relationship')
         phone = request.form.get('phone')
         email = request.form.get('email')
+        whatsapp = request.form.get('whatsapp')  # Get WhatsApp number
         
         if not all([name, relationship, phone, email]):
             return jsonify({
@@ -1873,6 +1952,14 @@ def add_emergency_contact():
                 'message': 'Invalid email format'
             })
             
+        # Validate WhatsApp number if provided
+        if whatsapp:
+            if not validate_phone(whatsapp):
+                return jsonify({
+                    'success': False,
+                    'message': 'Invalid WhatsApp number format'
+                })
+        
         # Add emergency contact
         contact_data = {
             'user_id': user_id,
@@ -1880,6 +1967,7 @@ def add_emergency_contact():
             'relationship': relationship,
             'phone': phone,
             'email': email,
+            'whatsapp': whatsapp or '',  # Store empty string if no WhatsApp number
             'created_at': datetime.now()
         }
         

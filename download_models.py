@@ -17,12 +17,7 @@ def main():
         os.makedirs('models')
 
     # Model files and their corresponding URLs
-    model_files = {
-        'deploy.prototxt': 'https://drive.google.com/uc?id=1Hy8HOUeOF4LqVrLrCz_SSesXHrqE8_iH',
-        'res10_300x300_ssd_iter_140000.caffemodel': 'https://drive.google.com/uc?id=1I7WqhCuHBh6V_6lrz-U0CQR_WtT8qI11',
-        'gender_deploy.prototxt': 'https://drive.google.com/uc?id=1AW3WduLk1haTVAxHOkVS_BEzel1KuxCW',
-        'gender_net.caffemodel': 'https://drive.google.com/uc?id=1W_moLzMlGiELyPxWiYQJ9KFaXroQ_NFQ'
-    }
+    model_files = {}  # No models needed
 
     success = True
     for filename, url in model_files.items():
