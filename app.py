@@ -86,17 +86,14 @@ if missing_vars:
 
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
 app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True').lower() == 'true'
+app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
 app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('EMAIL_USER')
-app.config['MAIL_MAX_EMAILS'] = None
-app.config['MAIL_ASCII_ATTACHMENTS'] = False
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_DEBUG'] = True
 app.config['MAIL_SUPPRESS_SEND'] = False
 app.config['MAIL_SEND_FAILED_SILENTLY'] = False
-app.config['MAIL_USE_SSL'] = False
 
 # Initialize Flask-Mail after all configurations
 mail = Mail()
@@ -136,8 +133,22 @@ def validate_email(email):
     return bool(re.match(pattern, email))
 
 def validate_phone(phone):
+    # Remove all non-digit characters
     phone = re.sub(r'\D', '', phone)
-    return len(phone) == 10
+    
+    # Check if length is 10
+    if len(phone) != 10:
+        return False
+        
+    # Check if all digits are 0
+    if all(digit == '0' for digit in phone):
+        return False
+        
+    # Check if first digit is between 6-9 (Indian mobile number format)
+    if not phone[0] in ['6', '7', '8', '9']:
+        return False
+        
+    return True
 
 def validate_password(password):
     if len(password) < 8:
@@ -154,9 +165,27 @@ def validate_name(name):
     return bool(re.match(r'^[a-zA-Z\s]{2,50}$', name))
 
 def validate_emergency_contact(contact):
+    """Validate emergency contact data"""
     if not contact:
-        return False
-    return validate_phone(contact)
+        return False, "Contact data is required"
+        
+    # Validate name
+    if not validate_name(contact.get('name', '')):
+        return False, "Invalid name format"
+        
+    # Validate email
+    if not validate_email(contact.get('email', '')):
+        return False, "Invalid email format"
+        
+    # Validate phone
+    if not validate_phone(contact.get('phone', '')):
+        return False, "Invalid phone number format"
+        
+    # Validate relationship
+    if not validate_name(contact.get('relationship', '')):
+        return False, "Invalid relationship format"
+        
+    return True, "Valid contact data"
 
 # Twilio configuration
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
@@ -190,11 +219,14 @@ if has_analytics:
 
 # Function to generate OTP
 def generate_otp():
-    return ''.join(random.choices(string.digits, k=6))
+    return ''.join(random.choices('0123456789', k=6))
 
 # Function to send OTP email
 def send_otp_email(email, otp):
     try:
+        logger.info(f"Attempting to send OTP email to: {email}")
+        logger.info(f"OTP generated: {otp}")
+        
         msg = Message(
             'Your OTP for Women Safety App',
             recipients=[email],
@@ -208,11 +240,15 @@ def send_otp_email(email, otp):
     except Exception as e:
         logger.error(f"Error sending OTP email: {str(e)}")
         logger.error(f"Full traceback: {traceback.format_exc()}")
+        logger.error(f"Email configuration: {app.config['MAIL_SERVER']}, Port: {app.config['MAIL_PORT']}, TLS: {app.config['MAIL_USE_TLS']}")
         return False
 
 # Function to send verification email
 def send_verification_email(email, otp):
     try:
+        logger.info(f"Attempting to send verification email to: {email}")
+        logger.info(f"Verification code generated: {otp}")
+        
         msg = Message(
             'Verify Your Email - Women Safety App',
             recipients=[email],
@@ -232,6 +268,7 @@ If you did not register for Women Safety App, please ignore this email.'''
     except Exception as e:
         logger.error(f"Error sending verification email: {str(e)}")
         logger.error(f"Full traceback: {traceback.format_exc()}")
+        logger.error(f"Email configuration: {app.config['MAIL_SERVER']}, Port: {app.config['MAIL_PORT']}, TLS: {app.config['MAIL_USE_TLS']}")
         return False
 
 # Add this after app initialization
@@ -407,10 +444,10 @@ def verify_email():
                 }
             )
             session.pop('verification_email', None)
-            flash('Email verified successfully! Please login.')
+            flash('6-digit OTP verified successfully! Please login.')
             return redirect(url_for('login'))
         else:
-            flash('Invalid verification code. Please try again.')
+            flash('Invalid 6-digit OTP. Please try again.')
             
     return render_template('verify_email.html')
 
@@ -566,8 +603,8 @@ def emergency():
     """Emergency page"""
     emergency_numbers = {
         'Police': '100',
-        'Women Helpline': '1091',
-        'Ambulance': '102',
+        'Women Helpline': '181',
+        'Ambulance': '108',
         'National Emergency': '112'
     }
     return render_template('emergency.html', emergency_numbers=emergency_numbers)
@@ -730,14 +767,13 @@ def emergency_contacts():
                     'message': 'No data provided'
                 }), 400
 
-            # Validate required fields
-            required_fields = ['name', 'email', 'relationship', 'phone']
-            for field in required_fields:
-                if not data.get(field):
-                    return jsonify({
-                        'success': False,
-                        'message': f'Missing required field: {field}'
-                    }), 400
+            # Validate contact data
+            is_valid, message = validate_emergency_contact(data)
+            if not is_valid:
+                return jsonify({
+                    'success': False,
+                    'message': message
+                }), 400
 
             # Create contact document
             contact = {
@@ -773,43 +809,65 @@ def emergency_contacts():
             'message': 'An error occurred while processing your request'
         }), 500
 
-@app.route('/api/emergency-contacts/<contact_id>', methods=['DELETE'])
+@app.route('/api/emergency-contacts/<contact_id>', methods=['PUT'])
 @login_required
-def delete_contact_api(contact_id):
+def update_contact_api(contact_id):
     try:
         user_id = session.get('user_id')
         if not user_id:
             return jsonify({'success': False, 'message': 'User not authenticated'}), 401
 
-        db = get_db()
-        
-        # Convert contact_id to ObjectId
-        try:
-            contact_id_obj = ObjectId(contact_id)
-        except:
-            return jsonify({'success': False, 'message': 'Invalid contact ID'}), 400
+        # Get form data
+        data = {
+            'name': request.form.get('name', '').strip(),
+            'email': request.form.get('email', '').lower().strip(),
+            'relationship': request.form.get('relationship', '').strip(),
+            'phone': request.form.get('phone', '').strip()
+        }
 
-        # Delete contact and ensure it belongs to the current user
-        result = db.emergency_contacts.delete_one({
-            '_id': contact_id_obj,
-            'user_id': user_id
-        })
+        # Validate contact data
+        is_valid, message = validate_emergency_contact(data)
+        if not is_valid:
+            return jsonify({
+                'success': False,
+                'message': message
+            }), 400
 
-        if result.deleted_count > 0:
+        # Update contact
+        result = db.emergency_contacts.update_one(
+            {
+                '_id': ObjectId(contact_id),
+                'user_id': user_id
+            },
+            {
+                '$set': {
+                    'name': data['name'],
+                    'email': data['email'],
+                    'relationship': data['relationship'],
+                    'phone': data['phone'],
+                    'updated_at': datetime.utcnow()
+                }
+            }
+        )
+
+        if result.modified_count > 0:
+            data['_id'] = contact_id
             return jsonify({
                 'success': True,
-                'message': 'Contact deleted successfully'
+                'message': 'Contact updated successfully',
+                'contact': data
             })
         else:
             return jsonify({
                 'success': False,
-                'message': 'Contact not found or unauthorized to delete'
+                'message': 'Contact not found or unauthorized to update'
             }), 404
 
     except Exception as e:
+        logger.error(f"Error updating contact: {str(e)}")
         return jsonify({
             'success': False,
-            'message': f'Failed to delete contact: {str(e)}'
+            'message': 'Failed to update contact'
         }), 500
 
 @app.route('/admin/dashboard')

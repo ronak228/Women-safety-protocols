@@ -101,9 +101,6 @@
                     </tbody>
                 </table>
             </div>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addContactModal">
-                <i class="fas fa-plus"></i> Add Alert Contact
-            </button>
         </div>
     </div>
 
@@ -145,42 +142,6 @@
                         <p class="text-center text-muted my-3">No recent alerts</p>
                     {% endif %}
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Add Contact Modal -->
-<div class="modal fade" id="addContactModal" tabindex="-1" aria-labelledby="addContactModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addContactModalLabel">Add Alert Contact</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="contactForm">
-                    <div class="mb-3">
-                        <label for="contactName" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="contactName" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="contactEmail" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="contactEmail" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="contactPhone" class="form-label">Phone</label>
-                        <input type="tel" class="form-control" id="contactPhone" required pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
-                    </div>
-                    <div class="mb-3">
-                        <label for="contactRelationship" class="form-label">Relationship</label>
-                        <input type="text" class="form-control" id="contactRelationship" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="addEmergencyContact()">Add Contact</button>
             </div>
         </div>
     </div>
@@ -245,13 +206,13 @@
 // Initialize live tracking map
 let liveMap = L.map('live-map').setView([0, 0], 2);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
+    attribution: ' OpenStreetMap contributors'
 }).addTo(liveMap);
 
 // Initialize history map
 let historyMap = L.map('history-map').setView([0, 0], 2);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
+    attribution: ' OpenStreetMap contributors'
 }).addTo(historyMap);
 
 // Get initial location
@@ -397,54 +358,6 @@ function contactEmergencyContacts() {
     });
 }
 
-// Add emergency contact function
-function addEmergencyContact() {
-    // Get form data
-    const formData = {
-        name: document.getElementById('contactName').value.trim(),
-        email: document.getElementById('contactEmail').value.trim(),
-        relationship: document.getElementById('contactRelationship').value.trim(),
-        phone: document.getElementById('contactPhone').value.trim()
-    };
-
-    // Validate form data
-    if (!formData.name || !formData.email || !formData.relationship || !formData.phone) {
-        alert('Please fill in all fields');
-        return;
-    }
-
-    // Send data to server
-    fetch('/api/emergency-contacts', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify(formData),
-        credentials: 'include'
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => Promise.reject(err));
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            alert('Contact added successfully');
-            // Reload the page to show the new contact
-            window.location.reload();
-        } else {
-            alert(data.message || 'Failed to add contact');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert(error.message || 'Failed to add contact. Please try again.');
-    });
-}
-
-// Delete emergency contact function
 function deleteContact(contactId) {
     if (confirm('Are you sure you want to delete this contact?')) {
         fetch(`/api/emergency-contacts/${contactId}`, {
@@ -471,34 +384,6 @@ function deleteContact(contactId) {
         });
     }
 }
-
-function triggerEmergency() {
-    if (confirm('Are you sure you want to send an emergency alert to your contacts?')) {
-        fetch('/trigger_emergency', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-            } else {
-                alert('Failed to send emergency alert. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to send emergency alert. Please try again.');
-        });
-    }
-}
-
-function showAddContactModal() {
-    const modal = new bootstrap.Modal(document.getElementById('addContactModal'));
-    modal.show();
-}
 </script>
 <script src="{{ url_for('static', filename='js/live_tracking.js') }}"></script>
-{% endblock %} 
+{% endblock %}

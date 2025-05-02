@@ -116,10 +116,10 @@
                         <input type="tel" id="phone" name="phone" required 
                             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-pastel-pink" 
                             placeholder="Enter your phone number"
-                            pattern="[0-9]{10}"
-                            title="Please enter a valid 10-digit phone number">
+                            pattern="[6-9][0-9]{9}"
+                            title="Please enter a valid 10-digit Indian mobile number starting with 6-9">
                     </div>
-                    <div class="error-message" id="phoneError">Please enter a valid 10-digit phone number</div>
+                    <div class="error-message" id="phoneError">Please enter a valid 10-digit Indian mobile number starting with 6-9</div>
                 </div>
 
                 <div>
@@ -183,7 +183,10 @@
             // Function to validate phone number
             function validatePhone(phone) {
                 const digits = phone.replace(/\D/g, '');
-                return digits.length === 10;
+                if (digits.length !== 10) return false;
+                if (digits.split('').every(digit => digit === '0')) return false;
+                if (!['6', '7', '8', '9'].includes(digits[0])) return false;
+                return true;
             }
 
             // Function to validate password
@@ -232,7 +235,7 @@
                             break;
                         case 'phone':
                             isValid = validatePhone(input.value);
-                            errorMessage = 'Please enter a valid 10-digit phone number';
+                            errorMessage = 'Please enter a valid 10-digit Indian mobile number starting with 6-9';
                             break;
                         case 'password':
                             isValid = validatePassword(input.value);

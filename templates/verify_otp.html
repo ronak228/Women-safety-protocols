@@ -35,7 +35,7 @@
                 Verify OTP
             </h2>
             <p class="mt-2 text-sm text-gray-600">
-                Please enter the verification code sent to your email
+                Please enter the 6-digit verification code
             </p>
         </div>
 
@@ -77,7 +77,7 @@
 
             <div>
                 <button type="submit" 
-                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary w-full">
                     Verify OTP
                 </button>
             </div>
@@ -85,7 +85,7 @@
     </div>
 
     <script>
-        // Auto-format OTP input
+        // Auto-format 6-digit OTP input
         document.getElementById('otp').addEventListener('input', function(e) {
             this.value = this.value.replace(/[^0-9]/g, '');
             if (this.value.length > 6) {
@@ -94,4 +94,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
